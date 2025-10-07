@@ -14,6 +14,9 @@ namespace JobPortal.Data
         public DbSet<Job> Jobs { get; set; }
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
+        public DbSet<SavedJob> SavedJobs { get; set; }
+        public DbSet<JobAlertSubscription> JobAlertSubscriptions { get; set; }
+        public DbSet<ContentPage> ContentPages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -21,6 +24,18 @@ namespace JobPortal.Data
 
             builder.Entity<JobApplication>()
                 .HasIndex(a => new { a.JobId, a.ApplicantId })
+                .IsUnique();
+
+            builder.Entity<SavedJob>()
+                .HasIndex(s => new { s.JobId, s.UserId })
+                .IsUnique();
+
+            builder.Entity<JobAlertSubscription>()
+                .HasIndex(a => new { a.UserId, a.Keyword, a.Country, a.JobType })
+                .IsUnique();
+
+            builder.Entity<ContentPage>()
+                .HasIndex(p => p.Slug)
                 .IsUnique();
 
             builder.Entity<Job>()
@@ -40,6 +55,18 @@ namespace JobPortal.Data
                 .WithOne(j => j.Provider)
                 .HasForeignKey(j => j.ProviderId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(u => u.SavedJobs)
+                .WithOne(s => s.User)
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(u => u.JobAlerts)
+                .WithOne(a => a.User)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

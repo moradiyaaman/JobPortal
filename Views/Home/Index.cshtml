@@ -1,95 +1,124 @@
 ﻿@model HomeStatsViewModel
 @{
-    ViewData["Title"] = "Online Job Portal";
+    ViewData["Title"] = "Dashboard";
+    var displayName = string.IsNullOrWhiteSpace(Model?.CurrentUserName) ? "Welcome" : Model.CurrentUserName;
+    var roleLabel = string.IsNullOrWhiteSpace(Model?.CurrentUserRoleLabel) ? "Job Seeker" : Model.CurrentUserRoleLabel;
+    string initials = "";
+    if (!string.IsNullOrWhiteSpace(displayName))
+    {
+        var nameParts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        initials = nameParts.Length >= 2
+            ? string.Concat(nameParts[0][0], nameParts[^1][0]).ToUpperInvariant()
+            : displayName.Length >= 2 ? displayName.Substring(0, Math.Min(2, displayName.Length)).ToUpperInvariant() : displayName.ToUpperInvariant();
+    }
 }
 
-<section class="hero">
-    <div class="hero__content">
-        <span class="badge badge--soft">Launch your next chapter</span>
-        <h1>Find the job that fits your life</h1>
-        <p class="lead">Explore curated opportunities, keep your profile polished, and apply in one click. Everything you need for a smarter job search.</p>
-        <div class="hero__actions">
-            <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary">Browse jobs</a>
-            <a asp-controller="Account" asp-action="Register" class="btn btn-outline">Create free account</a>
-        </div>
-    </div>
-    <div class="hero__stats">
-        <div class="hero-stat">
-            <span>@Model.TotalJobs</span>
-            <small>Active roles</small>
-        </div>
-        <div class="hero-stat">
-            <span>@Model.TotalApplications</span>
-            <small>Applications submitted</small>
-        </div>
-        <div class="hero-stat">
-            <span>@Model.TotalUsers</span>
-            <small>Talented professionals</small>
-        </div>
-    </div>
-</section>
-
-<section class="section">
-    <div class="highlight">
-        <div class="highlight__item">
-            <h3>Personalized profile</h3>
-            <p>Showcase your experience, education, and skills. Upload a resume that recruiters can download instantly.</p>
-        </div>
-        <div class="highlight__item">
-            <h3>Smart filters</h3>
-            <p>Zero in on the roles that matter using location, job type, and recency filters.</p>
-        </div>
-        <div class="highlight__item">
-            <h3>Admin oversight</h3>
-            <p>Employers manage listings, track applicants, and respond to inquiries in a unified dashboard.</p>
-        </div>
-    </div>
-</section>
-
-<section class="section">
-    <div class="section__header">
-        <h2>Latest opportunities</h2>
-        <a asp-controller="Jobs" asp-action="Index" class="link">View all jobs</a>
-    </div>
-
-    @if (!(Model.RecentJobs?.Any() ?? false))
-    {
-        <div class="empty-state">
-            <h3>No listings yet</h3>
-            <p class="text-muted">Check back soon for new opportunities.</p>
-        </div>
-    }
-    else
-    {
-        <div class="job-grid">
-            @foreach (var job in Model.RecentJobs)
+<div class="flex flex-col gap-8 lg:flex-row">
+    <aside class="w-full rounded-xl border border-border-light bg-surface-light p-6 shadow-sm dark:border-border-dark dark:bg-surface-dark lg:w-64">
+        <div class="flex items-center gap-3">
+            @if (!string.IsNullOrEmpty(Model?.ProfileAvatarUrl))
             {
-                <article class="job-card">
-                    @if (!string.IsNullOrWhiteSpace(job.CompanyLogoPath))
-                    {
-                        <img src="@job.CompanyLogoPath" alt="@job.CompanyName logo" class="company-logo" />
-                    }
-                    <div class="job-card__meta">
-                        <span class="badge">@job.JobType</span>
-                        <span class="text-muted">Posted @job.PostedAt.ToString("MMM d")</span>
-                    </div>
-                    <h3><a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.Id">@job.Title</a></h3>
-                    <p class="text-muted">@job.CompanyName · @job.Location</p>
-                    @if (!string.IsNullOrEmpty(job.Salary))
-                    {
-                        <p class="job-card__salary">@job.Salary</p>
-                    }
-                    <a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.Id" class="btn btn-secondary">View details</a>
-                </article>
+                <div class="aspect-square h-12 w-12 rounded-full bg-center bg-cover" style="background-image: url('@Url.Content(Model.ProfileAvatarUrl)');"></div>
+            }
+            else
+            {
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                    @initials
+                </div>
+            }
+            <div>
+                <h1 class="text-lg font-bold text-content-light dark:text-content-dark">@displayName</h1>
+                <p class="text-sm text-subtle-light dark:text-subtle-dark">@roleLabel</p>
+            </div>
+        </div>
+
+        <nav class="mt-8 flex flex-col gap-2 text-sm font-medium">
+            <a asp-controller="Home" asp-action="Index" class="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "bg-primary text-white" : "text-subtle-light hover:bg-primary/10 hover:text-primary")">
+                <span class="material-symbols-outlined">home</span>
+                <span>Home</span>
+            </a>
+            <a asp-controller="Jobs" asp-action="MyApplications" class="flex items-center gap-3 rounded-lg px-3 py-2 text-subtle-light transition hover:bg-primary/10 hover:text-primary">
+                <span class="material-symbols-outlined">group</span>
+                <span>My applications</span>
+            </a>
+            <a asp-controller="Jobs" asp-action="Index" class="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors @(ViewContext.RouteData.Values["controller"]?.ToString() == "Jobs" ? "bg-primary text-white" : "text-subtle-light hover:bg-primary/10 hover:text-primary")">
+                <span class="material-symbols-outlined">work</span>
+                <span>Jobs</span>
+            </a>
+            <a asp-controller="Contact" asp-action="Index" class="flex items-center gap-3 rounded-lg px-3 py-2 text-subtle-light transition hover:bg-primary/10 hover:text-primary">
+                <span class="material-symbols-outlined">chat</span>
+                <span>Support</span>
+            </a>
+        </nav>
+
+        <div class="mt-10 space-y-2 text-sm text-subtle-light dark:text-subtle-dark">
+            <a asp-controller="Account" asp-action="Profile" class="flex items-center gap-3 rounded-lg px-3 py-2 transition hover:bg-primary/10 hover:text-primary">
+                <span class="material-symbols-outlined">settings</span>
+                <span>Profile settings</span>
+            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form asp-controller="Account" asp-action="Logout" method="post" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-primary/10 hover:text-primary">
+                    <span class="material-symbols-outlined">logout</span>
+                    <button type="submit" class="text-sm font-medium">Sign out</button>
+                </form>
             }
         </div>
-    }
-</section>
+    </aside>
 
-<section class="cta">
-    <div class="cta__content">
-        <h2>Need support?</h2>
-        <p class="text-muted">Questions about posting a job or accessing your applications? We're here to help.</p>
-        <a asp-controller="Contact" asp-action="Index" class="btn btn-primary">Contact support</a>
-    </div>
-</section>
+    <main class="flex-1">
+        <div class="mb-8">
+            <form asp-controller="Jobs" asp-action="Index" method="get" class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-subtle-light dark:text-subtle-dark">search</span>
+                <input type="text" name="Keyword" value="@Context.Request.Query["Keyword"]" placeholder="Search roles, companies, keywords" class="w-full rounded-lg border border-border-light bg-surface-light py-3 pl-12 pr-12 text-sm text-content-light shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary/40 dark:border-border-dark dark:bg-surface-dark dark:text-content-dark" />
+                <button type="reset" class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-subtle-light transition hover:text-content-light dark:text-subtle-dark dark:hover:text-content-dark">close</button>
+            </form>
+        </div>
+
+        <h2 class="mb-6 text-2xl font-bold text-content-light dark:text-content-dark">Recommended for you</h2>
+
+        @if (!(Model?.RecentJobs?.Any() ?? false))
+        {
+            <div class="rounded-xl border border-dashed border-border-light bg-surface-light p-10 text-center text-subtle-light shadow-sm dark:border-border-dark dark:bg-surface-dark dark:text-subtle-dark">
+                <h3 class="text-lg font-semibold text-content-light dark:text-content-dark">No recommendations yet</h3>
+                <p class="mt-2 text-sm">Once new opportunities arrive, they'll appear here.</p>
+                <div class="mt-6">
+                    <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary">Browse all jobs</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+                @foreach (var job in Model.RecentJobs)
+                {
+                    var imageStyle = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(job.CompanyLogoPath))
+                    {
+                        imageStyle = $"background-image: url('{Url.Content(job.CompanyLogoPath)}')";
+                    }
+                    <article class="overflow-hidden rounded-xl border border-border-light bg-surface-light shadow-sm transition duration-300 hover:shadow-lg dark:border-border-dark dark:bg-surface-dark">
+                        <div class="h-40 w-full bg-cover bg-center" style="@(string.IsNullOrEmpty(imageStyle) ? "" : imageStyle)">
+                            @if (string.IsNullOrEmpty(imageStyle))
+                            {
+                                <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-primary/30 text-4xl text-primary/60">
+                                    <span class="material-symbols-outlined text-4xl">work</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-content-light dark:text-content-dark">
+                                <a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.Id" class="hover:text-primary">@job.Title</a>
+                            </h3>
+                            <p class="mt-1 text-sm text-subtle-light dark:text-subtle-dark">@job.CompanyName@if(!string.IsNullOrWhiteSpace(job.Location)){<text> · @job.Location</text>}</p>
+                            @if (!string.IsNullOrWhiteSpace(job.Salary))
+                            {
+                                <p class="mt-2 text-sm font-semibold text-primary">@job.Salary</p>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </main>
+</div>

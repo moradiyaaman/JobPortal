@@ -2,130 +2,276 @@
 @{
     ViewData["Title"] = "Profile";
 }
-<section class="page-header">
-    <h1>Your profile</h1>
-    <p class="text-muted">Keep your resume and professional story up to date for faster applications.</p>
-</section>
-
-@if (ViewData["Success"] != null)
-{
-    <div class="alert alert-success">@ViewData["Success"]</div>
+@{
+    var summaryParagraphs = string.IsNullOrWhiteSpace(Model.Summary)
+        ? System.Array.Empty<string>()
+        : Model.Summary.Split(new[] { "\r\n\r\n", "\n\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+    var skillChips = string.IsNullOrWhiteSpace(Model.Skills)
+        ? System.Array.Empty<string>()
+        : Model.Skills.Split(new[] { ',', '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim())
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .Distinct()
+            .ToArray();
+    var educationLines = string.IsNullOrWhiteSpace(Model.Education)
+        ? System.Array.Empty<string>()
+        : Model.Education.Split(new[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+    var experienceLines = string.IsNullOrWhiteSpace(Model.Experience)
+        ? System.Array.Empty<string>()
+        : Model.Experience.Split(new[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
 }
 
-<form asp-action="Profile" method="post" enctype="multipart/form-data" class="card card--padded">
-    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-    <div class="grid grid--two">
-        <div class="form-group">
-            <label asp-for="FullName"></label>
-            <input asp-for="FullName" class="form-control" />
-            <span asp-validation-for="FullName" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Headline"></label>
-            <input asp-for="Headline" class="form-control" />
-            <span asp-validation-for="Headline" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="grid grid--two">
-        <div class="form-group">
-            <label asp-for="Mobile"></label>
-            <input asp-for="Mobile" class="form-control" />
-            <span asp-validation-for="Mobile" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Country"></label>
-            <input asp-for="Country" class="form-control" />
-            <span asp-validation-for="Country" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="grid grid--two">
-        <div class="form-group">
-            <label asp-for="Address"></label>
-            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Address" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Summary"></label>
-            <textarea asp-for="Summary" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Summary" class="text-danger"></span>
+<section class="space-y-4">
+    <div class="rounded-3xl border border-slate-200 bg-gradient-to-r from-white via-white to-primary-50/80 p-8 shadow-sm">
+        <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-4">
+                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/10 text-2xl font-semibold text-primary-600">
+                    @Model.FullName?.FirstOrDefault()
+                </div>
+                <div>
+                    <h1 class="text-3xl font-semibold text-slate-900">@Model.FullName</h1>
+                    <p class="mt-1 text-sm text-slate-500">@(!string.IsNullOrWhiteSpace(Model.Headline) ? Model.Headline : "Add a headline to highlight your role")</p>
+                    <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                        @if (!string.IsNullOrWhiteSpace(Model.Country))
+                        {
+                            <span class="pill bg-slate-100 text-slate-600">@Model.Country</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.Mobile))
+                        {
+                            <span class="pill bg-slate-100 text-slate-600">@Model.Mobile</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2 text-sm text-slate-500">
+                <span class="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-slate-400">Profile strength</span>
+                <div class="h-2 w-48 rounded-full bg-slate-200">
+                    <div class="h-full w-4/5 rounded-full bg-primary-500"></div>
+                </div>
+                <span>Complete your profile to unlock tailored job matches.</span>
+            </div>
         </div>
     </div>
 
-    <div class="grid grid--two">
-        <div class="form-group">
-            <label asp-for="Education"></label>
-            <textarea asp-for="Education" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Education" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Experience"></label>
-            <textarea asp-for="Experience" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Experience" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Skills"></label>
-        <textarea asp-for="Skills" class="form-control" rows="3" placeholder="Design, Python, Project management"></textarea>
-        <span asp-validation-for="Skills" class="text-danger"></span>
-    </div>
-
-    @if (Model.IsProvider)
+    @if (ViewData["Success"] != null)
     {
-        <hr />
-        <h2 class="h5">Company profile</h2>
-        <p class="text-muted">These details appear on every job you post.</p>
-
-        <div class="grid grid--two">
-            <div class="form-group">
-                <label asp-for="CompanyName"></label>
-                <input asp-for="CompanyName" class="form-control" />
-                <span asp-validation-for="CompanyName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyWebsite"></label>
-                <input asp-for="CompanyWebsite" class="form-control" />
-                <span asp-validation-for="CompanyWebsite" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="grid grid--two">
-            <div class="form-group">
-                <label asp-for="CompanyLocation"></label>
-                <input asp-for="CompanyLocation" class="form-control" />
-                <span asp-validation-for="CompanyLocation" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyLogoFile"></label>
-                <input asp-for="CompanyLogoFile" type="file" class="form-control-file" />
-                <span asp-validation-for="CompanyLogoFile" class="text-danger"></span>
-                @if (!string.IsNullOrEmpty(Model.ExistingCompanyLogoPath))
-                {
-                    <p class="text-muted mt-2">Current logo: <img src="@Model.ExistingCompanyLogoPath" alt="Company logo" style="max-height:60px" /></p>
-                }
-            </div>
-        </div>
-        <div class="form-group">
-            <label asp-for="CompanyDescription"></label>
-            <textarea asp-for="CompanyDescription" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="CompanyDescription" class="text-danger"></span>
-        </div>
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">@ViewData["Success"]</div>
     }
 
-    <div class="form-group">
-        <label asp-for="ResumeFile"></label>
-        <input asp-for="ResumeFile" type="file" class="form-control-file" />
-        <span asp-validation-for="ResumeFile" class="text-danger"></span>
-        @if (!string.IsNullOrEmpty(Model.ExistingResumeFileName))
-        {
-            <p class="text-muted mt-2">Current file: <a href="@Model.ExistingResumeFileName" target="_blank">Download resume</a></p>
-        }
-    </div>
+    <div class="grid gap-8 lg:grid-cols-[1.1fr,1.4fr]">
+        <aside class="space-y-6">
+            <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-900">Professional summary</h2>
+                @if (summaryParagraphs.Any())
+                {
+                    <div class="mt-3 space-y-3 text-sm text-slate-600">
+                        @foreach (var paragraph in summaryParagraphs)
+                        {
+                            <p class="leading-relaxed">@paragraph.Trim()</p>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="mt-3 text-sm text-slate-500">Tell your story, highlight your strengths, and share what you do best.</p>
+                }
+            </div>
 
-    <button type="submit" class="btn btn-primary">Save changes</button>
-</form>
+            <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-slate-900">Resume</h2>
+                    <span class="material-symbols-rounded text-base text-slate-400">picture_as_pdf</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.ExistingResumeFileName))
+                {
+                    <a href="@Model.ExistingResumeFileName" target="_blank" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary-50 px-4 py-2 text-sm font-medium text-primary-600 hover:bg-primary-100">
+                        Download current resume
+                        <span class="material-symbols-rounded text-base">south_east</span>
+                    </a>
+                }
+                else
+                {
+                    <p class="mt-3 text-sm text-slate-500">Upload a resume to enable 1-click apply on every job.</p>
+                }
+            </div>
+
+            @if (skillChips.Any())
+            {
+                <div class="rounded-3xl border border-dashed border-primary-200 bg-primary-50/50 p-6 shadow-sm">
+                    <h2 class="text-lg font-semibold text-slate-900">Skills</h2>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        @foreach (var skill in skillChips)
+                        {
+                            <span class="pill bg-white/90 text-primary-600 ring-1 ring-primary-100">@skill</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-900">Education</h2>
+                @if (educationLines.Any())
+                {
+                    <ul class="mt-3 space-y-3 text-sm text-slate-600">
+                        @foreach (var item in educationLines)
+                        {
+                            <li class="leading-relaxed">@item.Trim()</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="mt-3 text-sm text-slate-500">Add your degrees, certifications, or bootcamps.</p>
+                }
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-900">Experience</h2>
+                @if (experienceLines.Any())
+                {
+                    <ul class="mt-3 space-y-3 text-sm text-slate-600">
+                        @foreach (var item in experienceLines)
+                        {
+                            <li class="leading-relaxed">@item.Trim()</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="mt-3 text-sm text-slate-500">Share your role history, notable wins, and impact.</p>
+                }
+            </div>
+
+            @if (Model.IsProvider)
+            {
+                <div class="rounded-3xl border border-dashed border-primary-200 bg-primary-50/50 p-6 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-slate-900">Company presence</h2>
+                        <span class="material-symbols-rounded text-base text-primary-500">workspace_premium</span>
+                    </div>
+                    <p class="mt-3 text-sm text-slate-600">Keep your brand consistent across every posting.</p>
+                    @if (!string.IsNullOrEmpty(Model.ExistingCompanyLogoPath))
+                    {
+                        <img src="@Model.ExistingCompanyLogoPath" alt="Company logo" class="mt-4 h-16 w-16 rounded-xl border border-primary-100 object-cover" />
+                    }
+                </div>
+            }
+        </aside>
+
+        <div>
+            <form asp-action="Profile" method="post" enctype="multipart/form-data" class="space-y-8 rounded-3xl border border-slate-200 bg-white/95 p-8 shadow-sm">
+                <div asp-validation-summary="ModelOnly" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert"></div>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="input-group">
+                        <label asp-for="FullName" class="text-sm font-medium text-slate-600"></label>
+                        <input asp-for="FullName" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                        <span asp-validation-for="FullName" class="text-sm text-red-500"></span>
+                    </div>
+                    <div class="input-group">
+                        <label asp-for="Headline" class="text-sm font-medium text-slate-600"></label>
+                        <input asp-for="Headline" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                        <span asp-validation-for="Headline" class="text-sm text-red-500"></span>
+                    </div>
+                    <div class="input-group">
+                        <label asp-for="Mobile" class="text-sm font-medium text-slate-600"></label>
+                        <input asp-for="Mobile" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                        <span asp-validation-for="Mobile" class="text-sm text-red-500"></span>
+                    </div>
+                    <div class="input-group">
+                        <label asp-for="Country" class="text-sm font-medium text-slate-600"></label>
+                        <input asp-for="Country" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                        <span asp-validation-for="Country" class="text-sm text-red-500"></span>
+                    </div>
+                    <div class="md:col-span-2 input-group">
+                        <label asp-for="Address" class="text-sm font-medium text-slate-600"></label>
+                        <textarea asp-for="Address" rows="3" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+                        <span asp-validation-for="Address" class="text-sm text-red-500"></span>
+                    </div>
+                    <div class="md:col-span-2 input-group">
+                        <label asp-for="Summary" class="text-sm font-medium text-slate-600"></label>
+                        <textarea asp-for="Summary" rows="4" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+                        <span asp-validation-for="Summary" class="text-sm text-red-500"></span>
+                    </div>
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="input-group">
+                        <label asp-for="Education" class="text-sm font-medium text-slate-600"></label>
+                        <textarea asp-for="Education" rows="4" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+                        <span asp-validation-for="Education" class="text-sm text-red-500"></span>
+                    </div>
+                    <div class="input-group">
+                        <label asp-for="Experience" class="text-sm font-medium text-slate-600"></label>
+                        <textarea asp-for="Experience" rows="4" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+                        <span asp-validation-for="Experience" class="text-sm text-red-500"></span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="Skills" class="text-sm font-medium text-slate-600"></label>
+                    <textarea asp-for="Skills" rows="3" placeholder="Design, Python, Project management" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+                    <span asp-validation-for="Skills" class="text-sm text-red-500"></span>
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="ResumeFile" class="text-sm font-medium text-slate-600"></label>
+                    <input asp-for="ResumeFile" type="file" class="w-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm focus:border-primary-500 focus:ring-primary-500" />
+                    <span asp-validation-for="ResumeFile" class="text-sm text-red-500"></span>
+                </div>
+
+                @if (Model.IsProvider)
+                {
+                    <div class="space-y-6 rounded-3xl border border-dashed border-primary-200 bg-primary-50/40 p-6">
+                        <div>
+                            <h2 class="text-lg font-semibold text-slate-900">Company profile</h2>
+                            <p class="text-sm text-slate-500">These details appear on every job you post.</p>
+                        </div>
+                        <div class="grid gap-6 md:grid-cols-2">
+                            <div class="input-group">
+                                <label asp-for="CompanyName" class="text-sm font-medium text-slate-600"></label>
+                                <input asp-for="CompanyName" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                                <span asp-validation-for="CompanyName" class="text-sm text-red-500"></span>
+                            </div>
+                            <div class="input-group">
+                                <label asp-for="CompanyWebsite" class="text-sm font-medium text-slate-600"></label>
+                                <input asp-for="CompanyWebsite" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                                <span asp-validation-for="CompanyWebsite" class="text-sm text-red-500"></span>
+                            </div>
+                            <div class="input-group">
+                                <label asp-for="CompanyLocation" class="text-sm font-medium text-slate-600"></label>
+                                <input asp-for="CompanyLocation" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                                <span asp-validation-for="CompanyLocation" class="text-sm text-red-500"></span>
+                            </div>
+                            <div class="input-group">
+                                <label asp-for="CompanyLogoFile" class="text-sm font-medium text-slate-600"></label>
+                                <input asp-for="CompanyLogoFile" type="file" class="w-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm focus:border-primary-500 focus:ring-primary-500" />
+                                <span asp-validation-for="CompanyLogoFile" class="text-sm text-red-500"></span>
+                                @if (!string.IsNullOrEmpty(Model.ExistingCompanyLogoPath))
+                                {
+                                    <p class="mt-2 text-xs text-slate-500">Current logo:<br /><img src="@Model.ExistingCompanyLogoPath" alt="Company logo" class="mt-2 h-12 w-12 rounded-full border border-slate-200 object-cover" /></p>
+                                }
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label asp-for="CompanyDescription" class="text-sm font-medium text-slate-600"></label>
+                            <textarea asp-for="CompanyDescription" rows="3" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+                            <span asp-validation-for="CompanyDescription" class="text-sm text-red-500"></span>
+                        </div>
+                    </div>
+                }
+
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <button type="submit" class="btn btn-primary w-full sm:w-auto">Save changes</button>
+                    @if (!string.IsNullOrEmpty(Model.ExistingResumeFileName))
+                    {
+                        <a href="@Model.ExistingResumeFileName" target="_blank" class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 sm:w-auto">Preview resume</a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

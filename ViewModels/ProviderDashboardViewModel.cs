@@ -33,4 +33,22 @@ namespace JobPortal.ViewModels
         public DateTime AppliedAt { get; set; }
         public string Status { get; set; }
     }
+
+    public class ProviderJobApplicationsViewModel
+    {
+        public int JobId { get; set; }
+        public string JobTitle { get; set; }
+        public IEnumerable<ProviderApplicationItemViewModel> Applications { get; set; }
+    }
+
+    public class ProviderApplicationItemViewModel
+    {
+        public int ApplicationId { get; set; }
+        public string ApplicantName { get; set; }
+        public string ApplicantEmail { get; set; }
+        public DateTime AppliedAt { get; set; }
+        public string Status { get; set; }
+        public string ResumeUrl { get; set; }
+        public string CoverLetter { get; set; }
+    }
 }

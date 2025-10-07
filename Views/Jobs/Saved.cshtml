@@ -1,0 +1,72 @@
+@model IEnumerable<JobListItemViewModel>
+@{
+    ViewData["Title"] = "Saved jobs";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<section class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-3xl font-semibold text-slate-900">Saved opportunities</h1>
+        <p class="text-sm text-slate-500">All the jobs you've bookmarked appear here for quick access.</p>
+    </div>
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <a asp-action="Index" class="btn btn-secondary">Browse jobs</a>
+        <a asp-action="Alerts" class="btn btn-secondary">Manage alerts</a>
+    </div>
+</section>
+
+@if (!(Model?.Any() ?? false))
+{
+    <div class="card mt-10 border border-dashed border-slate-200 px-6 py-12 text-center text-slate-500">
+        <h3 class="text-lg font-semibold text-slate-700">No saved jobs yet</h3>
+        <p class="mt-1 text-sm">Explore listings and tap "Save job" to build your shortlist.</p>
+    </div>
+}
+else
+{
+    <div class="mt-10 grid gap-6 lg:grid-cols-2">
+        @foreach (var job in Model)
+        {
+            <article class="card flex h-full flex-col gap-5 p-6">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                            <span class="pill bg-primary-50 text-primary-600">@job.JobType</span>
+                            <span>Saved · @job.PostedAt.ToString("MMM d")</span>
+                        </div>
+                        <h2 class="text-xl font-semibold text-slate-900">
+                            <a asp-action="Details" asp-route-id="@job.Id" class="hover:underline">@job.Title</a>
+                        </h2>
+                        <p class="text-sm text-slate-500">@job.CompanyName · @job.Location</p>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(job.CompanyLogoPath))
+                    {
+                        <img src="@job.CompanyLogoPath" alt="@job.CompanyName logo" class="h-12 w-12 rounded-full border border-slate-200 object-cover" />
+                    }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(job.ProviderSummary))
+                {
+                    <p class="text-sm text-slate-500">@job.ProviderSummary</p>
+                }
+                @if (!string.IsNullOrEmpty(job.Salary))
+                {
+                    <p class="text-sm font-medium text-primary-600">@job.Salary</p>
+                }
+                <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
+                    <a asp-action="Details" asp-route-id="@job.Id" class="btn btn-primary">View details</a>
+                    <div class="flex items-center gap-3">
+                        @if (job.IsApplied)
+                        {
+                            <span class="pill bg-emerald-50 text-emerald-600">Applied</span>
+                        }
+                        <form asp-action="Unsave" method="post" class="inline-flex">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@job.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="btn btn-secondary">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+}

@@ -1,113 +1,250 @@
 @model JobDetailViewModel
 @{
     ViewData["Title"] = Model.Title;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
 }
-<section class="page-header">
-    <div>
-        <p class="text-muted">@Model.CompanyName · @Model.Location</p>
-        <h1>@Model.Title</h1>
-        <div class="job-detail__meta">
-            <span class="badge">@Model.JobType</span>
-            <span class="text-muted">Posted @Model.PostedAt.ToString("MMMM d, yyyy")</span>
-        </div>
-    </div>
-    <div class="job-detail__actions">
-        @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoPath))
-        {
-            <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName logo" class="company-logo" />
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger">@TempData["Error"]</div>
-        }
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success">@TempData["Success"]</div>
-        }
-        @if (TempData["Info"] != null)
-        {
-            <div class="alert alert-info">@TempData["Info"]</div>
-        }
+@{
+    var descriptionSections = string.IsNullOrWhiteSpace(Model.Description)
+        ? System.Array.Empty<string>()
+        : Model.Description.Split(new[] { "\r\n\r\n", "\n\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+    var qualificationItems = string.IsNullOrWhiteSpace(Model.Qualifications)
+        ? System.Array.Empty<string>()
+        : Model.Qualifications.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries);
+    var experienceItems = string.IsNullOrWhiteSpace(Model.Experience)
+        ? System.Array.Empty<string>()
+        : Model.Experience.Split(new[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries);
+    var skillItems = string.IsNullOrWhiteSpace(Model.Skills)
+        ? System.Array.Empty<string>()
+        : Model.Skills.Split(new[] { ',', '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct()
+            .ToArray();
+}
 
-        @if (Model.IsApplied)
-        {
-            <button class="btn btn-disabled" disabled>Applied</button>
-        }
-        else if (!Model.CanApply)
-        {
-            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", new { id = Model.Id })" class="btn btn-primary">Sign in to apply</a>
-        }
-        else
-        {
-            <form asp-action="Apply" method="post" class="inline-form">
-                <input type="hidden" name="id" value="@Model.Id" />
-                <button type="submit" class="btn btn-primary">Apply now</button>
-            </form>
-        }
-    </div>
-</section>
+<section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-sm ring-1 ring-slate-100/80">
+    <div class="grid gap-8 lg:grid-cols-[2fr,1fr]">
+        <div class="space-y-6">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-primary-600">
+                    @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoPath))
+                    {
+                        <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName logo" class="h-16 w-16 rounded-2xl object-cover" />
+                    }
+                    else
+                    {
+                        <span class="text-2xl font-semibold">@Model.CompanyName?.FirstOrDefault()</span>
+                    }
+                </div>
+                <div class="space-y-2">
+                    <p class="text-sm text-slate-500">@Model.CompanyName · @Model.Location</p>
+                    <h1 class="text-3xl font-semibold text-slate-900">@Model.Title</h1>
+                    <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                        <span class="pill bg-primary-50 text-primary-600">@Model.JobType</span>
+                        <span class="pill bg-slate-100 text-slate-600">Posted @Model.PostedAt.ToString("MMM d, yyyy")</span>
+                        @if (!string.IsNullOrWhiteSpace(Model.Salary))
+                        {
+                            <span class="pill bg-emerald-50 text-emerald-600">@Model.Salary</span>
+                        }
+                    </div>
+                </div>
+            </div>
 
-<section class="card card--padded job-detail__body">
-    <div class="job-detail__content">
-        <h2>About the role</h2>
-        <p>@Html.Raw(Model.Description?.Replace("\n", "<br />"))</p>
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div class="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                    <p class="text-xs uppercase tracking-wide text-slate-400">Seniority</p>
+                    <p class="mt-1 text-sm font-medium text-slate-700">@(!string.IsNullOrWhiteSpace(Model.Experience) ? "Experience required" : "All levels welcome")</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                    <p class="text-xs uppercase tracking-wide text-slate-400">Work type</p>
+                    <p class="mt-1 text-sm font-medium text-slate-700">@Model.JobType</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                    <p class="text-xs uppercase tracking-wide text-slate-400">Compensation</p>
+                    <p class="mt-1 text-sm font-medium text-slate-700">@(!string.IsNullOrWhiteSpace(Model.Salary) ? Model.Salary : "Not disclosed")</p>
+                </div>
+            </div>
 
-        @if (!string.IsNullOrWhiteSpace(Model.Qualifications))
-        {
-            <h3>Qualifications</h3>
-            <p>@Html.Raw(Model.Qualifications?.Replace("\n", "<br />"))</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(Model.Experience))
-        {
-            <h3>Experience</h3>
-            <p>@Html.Raw(Model.Experience?.Replace("\n", "<br />"))</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(Model.Skills))
-        {
-            <h3>Core skills</h3>
-            <p>@Html.Raw(Model.Skills?.Replace("\n", "<br />"))</p>
-        }
-    </div>
-    <aside class="job-detail__sidebar">
-        <div class="info-card">
-            <h4>At a glance</h4>
-            <ul>
-                @if (!string.IsNullOrEmpty(Model.Salary))
-                {
-                    <li><strong>Salary</strong><span>@Model.Salary</span></li>
-                }
-                <li><strong>Location</strong><span>@Model.Location, @Model.Country</span></li>
-                <li><strong>Job type</strong><span>@Model.JobType</span></li>
-            </ul>
-        </div>
-        <div class="info-card">
-            <h4>Company</h4>
-            <ul>
-                <li><strong>Name</strong><span>@Model.CompanyName</span></li>
-                @if (!string.IsNullOrEmpty(Model.CompanyWebsite))
-                {
-                    <li><strong>Website</strong><span><a href="@Model.CompanyWebsite" target="_blank" rel="noopener">Visit site</a></span></li>
-                }
-            </ul>
-            @if (!string.IsNullOrWhiteSpace(Model.ProviderSummary))
+            @if (descriptionSections.Any())
             {
-                <p class="small text-muted mt-2">@Model.ProviderSummary</p>
+                <div class="space-y-5">
+                    <h2 class="text-2xl font-semibold text-slate-900">About this opportunity</h2>
+                    <div class="space-y-4 text-sm text-slate-600">
+                        @foreach (var paragraph in descriptionSections)
+                        {
+                            <p class="leading-relaxed">@paragraph.Trim()</p>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (qualificationItems.Any())
+            {
+                <div class="rounded-3xl bg-slate-50/70 p-6">
+                    <h3 class="text-lg font-semibold text-slate-900">Qualifications</h3>
+                    <ul class="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+                        @foreach (var item in qualificationItems)
+                        {
+                            <li class="flex items-start gap-2"><span class="mt-1 inline-flex h-1.5 w-1.5 rounded-full bg-primary-500"></span><span class="leading-relaxed">@item.Trim()</span></li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (experienceItems.Any())
+            {
+                <div class="rounded-3xl bg-slate-50/70 p-6">
+                    <h3 class="text-lg font-semibold text-slate-900">Experience</h3>
+                    <ul class="mt-4 space-y-2 text-sm text-slate-600">
+                        @foreach (var item in experienceItems)
+                        {
+                            <li class="flex gap-3"><span class="mt-1 h-1.5 w-8 rounded-full bg-primary-200"></span><span class="leading-relaxed">@item.Trim()</span></li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (skillItems.Any())
+            {
+                <div class="rounded-3xl border border-dashed border-primary-200 bg-primary-50/60 p-6">
+                    <h3 class="text-lg font-semibold text-slate-900">Core skills</h3>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        @foreach (var skill in skillItems)
+                        {
+                            <span class="pill bg-white/80 text-primary-600 ring-1 ring-primary-100">@skill</span>
+                        }
+                    </div>
+                </div>
             }
         </div>
-        @if (!string.IsNullOrWhiteSpace(Model.ProviderDisplayName) && Model.ProviderDisplayName != Model.CompanyName)
-        {
-            <div class="info-card">
-                <h4>Posted by</h4>
-                <p class="mb-1"><strong>@Model.ProviderDisplayName</strong></p>
-                @if (!string.IsNullOrWhiteSpace(Model.ProviderWebsite))
+
+        <aside class="flex flex-col gap-6">
+            <div class="space-y-3">
+                @if (TempData["Error"] != null)
                 {
-                    <p class="small"><a href="@Model.ProviderWebsite" target="_blank" rel="noopener">Company profile</a></p>
+                    <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">@TempData["Error"]</div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">@TempData["Success"]</div>
+                }
+                @if (TempData["Info"] != null)
+                {
+                    <div class="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-600">@TempData["Info"]</div>
+                }
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-slate-50/60 p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-900">Apply now</h2>
+                <p class="mt-1 text-sm text-slate-600">We'll use the info stored in your profile for a quick apply experience.</p>
+
+                <div class="mt-5 space-y-3">
+                    @if (Model.CanSave)
+                    {
+                        <form asp-action="@(Model.IsSaved ? "Unsave" : "Save")" method="post" class="w-full">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="btn btn-secondary w-full">@(Model.IsSaved ? "Saved to list" : "Save job for later")</button>
+                        </form>
+                    }
+
+                    @if (Model.IsApplied)
+                    {
+                        <span class="inline-flex w-full items-center justify-center rounded-xl bg-emerald-100 px-4 py-3 text-sm font-medium text-emerald-700">Application submitted</span>
+                    }
+                    else if (!Model.CanApply)
+                    {
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", new { id = Model.Id })" class="btn btn-primary w-full">Sign in to apply</a>
+                    }
+                    else
+                    {
+                        <a href="#apply" class="btn btn-primary w-full">Start application</a>
+                    }
+                </div>
+
+                <dl class="mt-6 space-y-3 text-sm text-slate-600">
+                    @if (!string.IsNullOrEmpty(Model.Salary))
+                    {
+                        <div class="flex items-center justify-between gap-3">
+                            <dt class="text-slate-500">Salary range</dt>
+                            <dd class="font-medium text-slate-900">@Model.Salary</dd>
+                        </div>
+                    }
+                    <div class="flex items-center justify-between gap-3">
+                        <dt class="text-slate-500">Location</dt>
+                        <dd class="font-medium text-slate-900">@Model.Location, @Model.Country</dd>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <dt class="text-slate-500">Job type</dt>
+                        <dd class="font-medium text-slate-900">@Model.JobType</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white/80 p-6">
+                <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Company snapshot</h3>
+                <p class="mt-2 text-base font-semibold text-slate-900">@Model.CompanyName</p>
+                @if (!string.IsNullOrEmpty(Model.CompanyWebsite))
+                {
+                    <a href="@Model.CompanyWebsite" target="_blank" rel="noopener" class="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700">
+                        Visit website
+                        <span class="material-symbols-rounded text-base">open_in_new</span>
+                    </a>
                 }
                 @if (!string.IsNullOrWhiteSpace(Model.ProviderSummary))
                 {
-                    <p class="small text-muted">@Model.ProviderSummary</p>
+                    <p class="mt-3 text-sm leading-relaxed text-slate-600">@Model.ProviderSummary</p>
                 }
             </div>
-        }
-    </aside>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ProviderDisplayName) && Model.ProviderDisplayName != Model.CompanyName)
+            {
+                <div class="rounded-3xl border border-slate-200 bg-slate-50/70 p-6">
+                    <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Posted by</h3>
+                    <p class="mt-2 text-base font-semibold text-slate-900">@Model.ProviderDisplayName</p>
+                    @if (!string.IsNullOrWhiteSpace(Model.ProviderWebsite))
+                    {
+                        <a href="@Model.ProviderWebsite" target="_blank" rel="noopener" class="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700">
+                            Company profile
+                            <span class="material-symbols-rounded text-base">arrow_outward</span>
+                        </a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.ProviderSummary))
+                    {
+                        <p class="mt-3 text-sm leading-relaxed text-slate-600">@Model.ProviderSummary</p>
+                    }
+                </div>
+            }
+        </aside>
+    </div>
 </section>
+
+@if (Model.CanApply && !Model.IsApplied)
+{
+    <section id="apply" class="mt-12 rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-sm">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+                <h2 class="text-2xl font-semibold text-slate-900">Finish your application</h2>
+                <p class="mt-1 text-sm text-slate-500">Attach a tailored cover letter so the hiring manager can see your impact fast.</p>
+            </div>
+            <div class="flex items-center gap-3 text-sm text-slate-500">
+                <span class="material-symbols-rounded text-primary-500">shield_person</span>
+                <span>We never share your data without consent.</span>
+            </div>
+        </div>
+        <form asp-action="Apply" method="post" class="mt-8 space-y-6">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="space-y-2">
+                <label for="coverLetter" class="text-sm font-medium text-slate-600">Cover letter</label>
+                <textarea id="coverLetter" name="coverLetter" rows="7" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" placeholder="Introduce yourself, highlight recent wins, and share why you're excited about @Model.CompanyName."></textarea>
+                <p class="text-xs text-slate-400">Optional, max 4000 characters.</p>
+            </div>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button type="submit" class="btn btn-primary w-full sm:w-auto">Submit application</button>
+                <button type="button" class="btn btn-ghost w-full sm:w-auto" onclick="window.history.back();return false;">Back</button>
+            </div>
+        </form>
+    </section>
+}

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JobPortal.Data;
 using JobPortal.Models;
+using JobPortal.Services;
 using JobPortal.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -17,11 +18,22 @@ namespace JobPortal.Areas.Provider.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
+        private static readonly string[] ApplicationStatuses = new[]
+        {
+            "Applied",
+            "Under Review",
+            "Interviewing",
+            "Shortlisted",
+            "Offer",
+            "Rejected"
+        };
 
-        public JobsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public JobsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Index()
@@ -236,6 +248,100 @@ namespace JobPortal.Areas.Provider.Controllers
             model.ProviderCompanyLocation = provider.CompanyLocation ?? provider.Country;
             model.ProviderCompanyDescription = provider.CompanyDescription;
             return model;
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Applications(int id)
+        {
+            var provider = await _userManager.GetUserAsync(User);
+            if (provider == null)
+            {
+                return Challenge();
+            }
+
+            var job = await _context.Jobs
+                .Include(j => j.Applications)
+                .ThenInclude(a => a.Applicant)
+                .FirstOrDefaultAsync(j => j.Id == id && j.ProviderId == provider.Id);
+
+            if (job == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ProviderJobApplicationsViewModel
+            {
+                JobId = job.Id,
+                JobTitle = job.Title,
+                Applications = job.Applications
+                    .OrderByDescending(a => a.AppliedAt)
+                    .Select(a => new ProviderApplicationItemViewModel
+                    {
+                        ApplicationId = a.Id,
+                        ApplicantName = a.Applicant.FullName ?? a.Applicant.Email,
+                        ApplicantEmail = a.Applicant.Email,
+                        AppliedAt = a.AppliedAt,
+                        Status = a.Status,
+                        ResumeUrl = a.Applicant.ResumeFileName,
+                        CoverLetter = a.CoverLetter
+                    })
+            };
+
+            ViewBag.StatusOptions = ApplicationStatuses;
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateApplicationStatus(int id, string status)
+        {
+            var provider = await _userManager.GetUserAsync(User);
+            if (provider == null)
+            {
+                return Challenge();
+            }
+
+            if (string.IsNullOrWhiteSpace(status) || !ApplicationStatuses.Contains(status))
+            {
+                TempData["Error"] = "Select a valid status before saving.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var application = await _context.JobApplications
+                .Include(a => a.Job)
+                .Include(a => a.Applicant)
+                .FirstOrDefaultAsync(a => a.Id == id && a.Job.ProviderId == provider.Id);
+
+            if (application == null)
+            {
+                return NotFound();
+            }
+
+            application.Status = status;
+            await _context.SaveChangesAsync();
+
+            if (!string.IsNullOrWhiteSpace(application.Applicant?.Email))
+            {
+                var subject = $"Update on your application for {application.Job.Title}";
+                var applicantName = application.Applicant.FullName ?? application.Applicant.Email;
+                var body = $"<p>Hi {applicantName},</p>" +
+                           $"<p>Your application for <strong>{application.Job.Title}</strong> has been marked as <strong>{status}</strong>.</p>" +
+                           "<p>We'll keep you posted on any further updates.</p>" +
+                           "<p>— The hiring team</p>";
+
+                try
+                {
+                    await _emailService.SendAsync(application.Applicant.Email, subject, body);
+                }
+                catch (Exception)
+                {
+                    // If email fails we still consider the status update successful.
+                }
+            }
+
+            TempData["Success"] = "Application status updated.";
+            return RedirectToAction(nameof(Applications), new { id = application.JobId });
         }
     }
 }

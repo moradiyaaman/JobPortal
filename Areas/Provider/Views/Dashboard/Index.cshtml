@@ -1,107 +1,92 @@
 @model ProviderDashboardViewModel
 @{
-    ViewData["Title"] = "Provider dashboard";
+    ViewData["Title"] = "Dashboard";
 }
-<section class="dashboard">
-    <header class="mb-4">
-        <h1 class="h3">Welcome back, @Model.CompanyName</h1>
-        @if (!string.IsNullOrWhiteSpace(Model.CompanyDescription))
-        {
-            <p class="text-muted">@Model.CompanyDescription</p>
-        }
-        <div class="small text-muted">
-            @if (!string.IsNullOrWhiteSpace(Model.CompanyLocation))
-            {
-                <span><strong>Location:</strong> @Model.CompanyLocation</span>
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
-            {
-                <span class="ml-3"><strong>Website:</strong> <a href="@Model.CompanyWebsite" target="_blank" rel="noopener">@Model.CompanyWebsite</a></span>
-            }
-        </div>
-    </header>
+<div class="flex flex-col min-h-screen">
+    <main class="flex-grow">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+                    @if (!string.IsNullOrWhiteSpace(Model.CompanyDescription))
+                    {
+                        <p class="mt-1 text-slate-600 dark:text-slate-400">@Model.CompanyDescription</p>
+                    }
+                </div>
+                <a asp-area="Provider" asp-controller="Jobs" asp-action="Create" class="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"></path>
+                    </svg>
+                    <span>Post a New Job</span>
+                </a>
+            </div>
 
-    <div class="row text-center mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="display-4">@Model.ActiveJobs</div>
-                    <div class="text-muted">Active jobs</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <h2 class="text-lg font-medium text-slate-500 dark:text-slate-400 mb-2">Active Jobs</h2>
+                    <p class="text-4xl font-bold text-slate-900 dark:text-white">@Model.ActiveJobs</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <h2 class="text-lg font-medium text-slate-500 dark:text-slate-400 mb-2">Total Jobs Posted</h2>
+                    <p class="text-4xl font-bold text-slate-900 dark:text-white">@Model.TotalJobs</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <h2 class="text-lg font-medium text-slate-500 dark:text-slate-400 mb-2">Applications Received</h2>
+                    <p class="text-4xl font-bold text-slate-900 dark:text-white">@Model.TotalApplications</p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="display-4">@Model.TotalJobs</div>
-                    <div class="text-muted">Total postings</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="display-4">@Model.TotalApplications</div>
-                    <div class="text-muted">Applications received</div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0">Recent postings</h2>
-                    <a asp-area="Provider" asp-controller="Jobs" asp-action="Create" class="btn btn-sm btn-primary">New job</a>
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Recent Job Postings</h2>
+                    <a asp-area="Provider" asp-controller="Jobs" asp-action="Index" class="text-primary hover:underline">Manage jobs</a>
                 </div>
-                <ul class="list-group list-group-flush">
-                    @if (Model.RecentJobs?.Any() == true)
-                    {
-                        foreach (var job in Model.RecentJobs)
+                <div class="overflow-x-auto bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <table class="w-full text-sm text-left text-slate-500 dark:text-slate-400">
+                        <thead class="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-800">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Job Title</th>
+                                <th scope="col" class="px-6 py-3">Posted Date</th>
+                                <th scope="col" class="px-6 py-3">Applications</th>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3"><span class="sr-only">Actions</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.RecentJobs?.Any() == true)
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>@job.Title</strong>
-                                    <div class="small text-muted">Posted @job.PostedAt.ToLocalTime():g • @job.ApplicationCount application(s)</div>
-                                </div>
-                                <span class="badge @(job.IsActive ? "badge-success" : "badge-secondary")">@(job.IsActive ? "Active" : "Paused")</span>
-                            </li>
+                            foreach (var job in Model.RecentJobs)
+                            {
+                                <tr class="bg-white dark:bg-slate-900 border-b dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
+                                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">@job.Title</th>
+                                    <td class="px-6 py-4">@job.PostedAt.ToLocalTime():yyyy-MM-dd</td>
+                                    <td class="px-6 py-4">@job.ApplicationCount</td>
+                                    <td class="px-6 py-4">
+                                        @if (job.IsActive)
+                                        {
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-300">Paused</span>
+                                        }
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <a asp-area="Provider" asp-controller="Jobs" asp-action="Edit" asp-route-id="@job.Id" class="font-medium text-primary hover:underline">Edit</a>
+                                    </td>
+                                </tr>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <li class="list-group-item text-muted">No jobs posted yet.</li>
-                    }
-                </ul>
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="px-6 py-8 text-center text-slate-500">No jobs posted yet.</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header">
-                    <h2 class="h5 mb-0">Recent applications</h2>
-                </div>
-                <ul class="list-group list-group-flush">
-                    @if (Model.RecentApplications?.Any() == true)
-                    {
-                        foreach (var application in Model.RecentApplications)
-                        {
-                            <li class="list-group-item">
-                                <strong>@application.ApplicantName</strong>
-                                <div class="small text-muted">
-                                    Applied for <a asp-area="Provider" asp-controller="Jobs" asp-action="Edit" asp-route-id="@application.JobId">@application.JobTitle</a>
-                                    on @application.AppliedAt.ToLocalTime():g
-                                </div>
-                                <span class="badge badge-light">@application.Status</span>
-                            </li>
-                        }
-                    }
-                    else
-                    {
-                        <li class="list-group-item text-muted">No applications yet.</li>
-                    }
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
+    </main>
+</div>

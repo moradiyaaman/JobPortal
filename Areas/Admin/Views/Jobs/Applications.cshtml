@@ -2,53 +2,63 @@
 @{
     ViewData["Title"] = "Applications";
 }
-<section class="page-header">
+<section class="flex flex-wrap items-center justify-between gap-4">
     <div>
-        <h1>@Model.Title</h1>
-        <p class="text-muted">@Model.CompanyName · @Model.Location</p>
+        <h1 class="text-2xl font-semibold text-slate-900">@Model.Title</h1>
+        <p class="text-sm text-slate-500">@Model.CompanyName · @Model.Location</p>
     </div>
-    <a asp-action="Index" class="btn btn-outline">Back to jobs</a>
+    <a asp-action="Index" class="btn btn-tertiary">← Back to jobs</a>
 </section>
 
 @if (!(Model.Applications?.Any() ?? false))
 {
-    <div class="empty-state">
-        <h3>No applicants yet</h3>
-        <p class="text-muted">Share this listing to attract more candidates.</p>
+    <div class="card text-center">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-7 w-7"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.5 21h13a1.5 1.5 0 0 0 1.5-1.5v-9.586a1.5 1.5 0 0 0-.44-1.06l-4.914-4.914A1.5 1.5 0 0 0 13.586 3H5.5A1.5 1.5 0 0 0 4 4.5v15A1.5 1.5 0 0 0 5.5 21Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3v4.5a1.5 1.5 0 0 0 1.5 1.5H15"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-slate-900">No applicants yet</h3>
+        <p class="mt-2 text-sm text-slate-500">Share this listing to attract more candidates.</p>
     </div>
 }
 else
 {
-    <table class="table table--responsive">
-        <thead>
-            <tr>
-                <th>Applicant</th>
-                <th>Email</th>
-                <th>Applied</th>
-                <th>Status</th>
-                <th>Resume</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var application in Model.Applications.OrderByDescending(a => a.AppliedAt))
-        {
-            <tr>
-                <td data-label="Applicant">@application.Applicant.FullName</td>
-                <td data-label="Email">@application.Applicant.Email</td>
-                <td data-label="Applied">@application.AppliedAt.ToString("MMM d, yyyy")</td>
-                <td data-label="Status"><span class="status-pill">@application.Status</span></td>
-                <td data-label="Resume">
-                    @if (!string.IsNullOrEmpty(application.Applicant.ResumeFileName))
-                    {
-                        <a href="@application.Applicant.ResumeFileName" target="_blank" class="btn btn-secondary">Download</a>
-                    }
-                    else
-                    {
-                        <span class="text-muted">Not uploaded</span>
-                    }
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <div class="card overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Applicants (@Model.Applications?.Count ?? 0)</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <tr>
+                        <th class="px-6 py-3">Applicant</th>
+                        <th class="px-6 py-3">Email</th>
+                        <th class="px-6 py-3">Applied</th>
+                        <th class="px-6 py-3">Status</th>
+                        <th class="px-6 py-3">Resume</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-600">
+                @foreach (var application in Model.Applications.OrderByDescending(a => a.AppliedAt))
+                {
+                    <tr class="hover:bg-slate-50/60">
+                        <td class="px-6 py-4 font-medium text-slate-900">@(application.Applicant?.FullName ?? application.Applicant?.UserName)</td>
+                        <td class="px-6 py-4">@application.Applicant?.Email</td>
+                        <td class="px-6 py-4">@application.AppliedAt.ToString("MMM d, yyyy")</td>
+                        <td class="px-6 py-4"><span class="pill bg-primary-50 text-primary-600">@application.Status</span></td>
+                        <td class="px-6 py-4">
+                            @if (!string.IsNullOrEmpty(application.Applicant?.ResumeFileName))
+                            {
+                                <a href="@application.Applicant.ResumeFileName" target="_blank" class="btn btn-secondary">Download</a>
+                            }
+                            else
+                            {
+                                <span class="text-slate-400">Not uploaded</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }

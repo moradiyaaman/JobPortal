@@ -20,5 +20,8 @@ namespace JobPortal.Models
 
         [MaxLength(60)]
         public string Status { get; set; } = "Applied";
+
+        [MaxLength(4000)]
+        public string CoverLetter { get; set; }
     }
 }

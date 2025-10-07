@@ -2,95 +2,125 @@
 @{
     ViewData["Title"] = "Create account";
 }
-<section class="auth-card">
-    <div class="auth-card__header">
-        <h1>Create your account</h1>
-        <p class="text-muted">Join to track jobs, manage applications, and connect with employers.</p>
+<section class="relative isolate rounded-3xl border border-slate-200 bg-background-light/60 py-12 shadow-inner dark:border-white/10 dark:bg-background-dark/40">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-6 border-b border-slate-200/70 pb-6 dark:border-white/10 md:flex-row md:items-center md:justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 text-primary">
+                    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <div class="text-background-dark dark:text-background-light">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">CareerConnect</p>
+                    <h1 class="text-2xl font-semibold">Let&apos;s create your account</h1>
+                </div>
+            </div>
+            <a asp-action="Login" class="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/20 dark:bg-primary/20 dark:text-background-light">Already have an account?</a>
+        </div>
+
+        <div class="mx-auto w-full max-w-3xl rounded-xl border border-slate-200/70 bg-white p-10 shadow-xl dark:border-white/10 dark:bg-background-dark/60">
+            <div class="space-y-3 text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-background-dark dark:text-background-light">Create your account</h2>
+                <p class="text-sm text-background-dark/70 dark:text-background-light/70">Join thousands of professionals finding their next big opportunity.</p>
+            </div>
+
+            <form asp-action="Register" method="post" enctype="multipart/form-data" class="mt-8 space-y-8">
+                <div asp-validation-summary="ModelOnly" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert"></div>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div>
+                        <label asp-for="AccountType" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <select asp-for="AccountType" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light">
+                            <option value="Seeker">Job seeker</option>
+                            <option value="Provider">Provider / Employer</option>
+                        </select>
+                        <span asp-validation-for="AccountType" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="UserName" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <input asp-for="UserName" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" autocomplete="username" placeholder="Username" />
+                        <span asp-validation-for="UserName" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="FullName" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <input asp-for="FullName" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" autocomplete="name" placeholder="Full name" />
+                        <span asp-validation-for="FullName" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Email" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <input asp-for="Email" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" autocomplete="email" placeholder="Email address" />
+                        <span asp-validation-for="Email" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Mobile" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <input asp-for="Mobile" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" autocomplete="tel" placeholder="Mobile" />
+                        <span asp-validation-for="Mobile" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Country" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <input asp-for="Country" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" placeholder="Country" />
+                        <span asp-validation-for="Country" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="Address" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <textarea asp-for="Address" rows="2" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" placeholder="Street, city, zip"></textarea>
+                        <span asp-validation-for="Address" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Password" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <input asp-for="Password" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" autocomplete="new-password" placeholder="Password" />
+                        <span asp-validation-for="Password" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                    <div>
+                        <label asp-for="ConfirmPassword" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                        <input asp-for="ConfirmPassword" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" autocomplete="new-password" placeholder="Confirm password" />
+                        <span asp-validation-for="ConfirmPassword" class="mt-1 block text-sm text-rose-500"></span>
+                    </div>
+                </div>
+
+                <div class="space-y-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6" data-provider-fields>
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h3 class="text-lg font-semibold text-background-dark dark:text-background-light">Company details</h3>
+                            <p class="text-sm text-background-dark/70 dark:text-background-light/70">Required for provider accounts so seekers can trust your brand.</p>
+                        </div>
+                        <span class="material-symbols-rounded text-xl text-primary">workspace_premium</span>
+                    </div>
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div>
+                            <label asp-for="CompanyName" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                            <input asp-for="CompanyName" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" placeholder="Company name" />
+                            <span asp-validation-for="CompanyName" class="mt-1 block text-sm text-rose-500"></span>
+                        </div>
+                        <div>
+                            <label asp-for="CompanyWebsite" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                            <input asp-for="CompanyWebsite" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" placeholder="https://" />
+                            <span asp-validation-for="CompanyWebsite" class="mt-1 block text-sm text-rose-500"></span>
+                        </div>
+                        <div>
+                            <label asp-for="CompanyLocation" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                            <input asp-for="CompanyLocation" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" placeholder="City, Country" />
+                            <span asp-validation-for="CompanyLocation" class="mt-1 block text-sm text-rose-500"></span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label asp-for="CompanyDescription" class="text-sm font-medium text-background-dark/80 dark:text-background-light/80"></label>
+                            <textarea asp-for="CompanyDescription" rows="3" class="form-input mt-2 block w-full rounded-lg border border-background-dark/20 bg-background-light px-3 py-3 text-sm text-background-dark placeholder-background-dark/60 focus:border-primary focus:outline-none focus:ring-primary dark:border-background-light/20 dark:bg-background-dark dark:text-background-light" placeholder="Describe your team, culture, and mission"></textarea>
+                            <span asp-validation-for="CompanyDescription" class="mt-1 block text-sm text-rose-500"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 text-center">
+                    <button type="submit" class="group relative flex w-full justify-center rounded-lg border border-transparent bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">Create account</button>
+                    <p class="text-sm text-background-dark/70 dark:text-background-light/70">
+                        Already have an account?
+                        <a asp-action="Login" class="font-medium text-primary hover:text-primary/80">Sign in</a>
+                    </p>
+                </div>
+            </form>
+        </div>
     </div>
-    <form asp-action="Register" method="post" class="form-grid" enctype="multipart/form-data">
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-        <div class="form-group">
-            <label asp-for="AccountType"></label>
-            <select asp-for="AccountType" class="form-control">
-                <option value="Seeker">Job seeker</option>
-                <option value="Provider">Provider / Employer</option>
-            </select>
-            <span asp-validation-for="AccountType" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="UserName"></label>
-            <input asp-for="UserName" class="form-control" autocomplete="username" />
-            <span asp-validation-for="UserName" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="FullName"></label>
-            <input asp-for="FullName" class="form-control" autocomplete="name" />
-            <span asp-validation-for="FullName" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Email"></label>
-            <input asp-for="Email" class="form-control" autocomplete="email" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Mobile"></label>
-            <input asp-for="Mobile" class="form-control" autocomplete="tel" />
-            <span asp-validation-for="Mobile" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Country"></label>
-            <input asp-for="Country" class="form-control" />
-            <span asp-validation-for="Country" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Address"></label>
-            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
-            <span asp-validation-for="Address" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Password"></label>
-            <input asp-for="Password" class="form-control" autocomplete="new-password" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="ConfirmPassword"></label>
-            <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <div class="provider-fields" data-provider-fields>
-            <h2 class="h5 mt-4">Company details</h2>
-            <p class="text-muted">These fields are required for provider accounts.</p>
-
-            <div class="form-group">
-                <label asp-for="CompanyName"></label>
-                <input asp-for="CompanyName" class="form-control" />
-                <span asp-validation-for="CompanyName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyWebsite"></label>
-                <input asp-for="CompanyWebsite" class="form-control" />
-                <span asp-validation-for="CompanyWebsite" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyLocation"></label>
-                <input asp-for="CompanyLocation" class="form-control" />
-                <span asp-validation-for="CompanyLocation" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyDescription"></label>
-                <textarea asp-for="CompanyDescription" rows="3" class="form-control"></textarea>
-                <span asp-validation-for="CompanyDescription" class="text-danger"></span>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block">Create account</button>
-        <p class="text-center text-muted mt-3">
-            Already have an account? <a asp-action="Login">Sign in</a>
-        </p>
-    </form>
 </section>
 
 @section Scripts {

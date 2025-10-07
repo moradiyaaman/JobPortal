@@ -1,83 +1,83 @@
 @model ProviderJobFormViewModel
-<div class="row">
-    <div class="col-lg-8">
-        <div class="form-group">
-            <label asp-for="Title"></label>
-            <input asp-for="Title" class="form-control" />
-            <span asp-validation-for="Title" class="text-danger"></span>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-5">
+        <div>
+            <label asp-for="Title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+            <input asp-for="Title" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+            <span asp-validation-for="Title" class="text-sm text-red-500"></span>
         </div>
-        <div class="form-group">
-            <label asp-for="Description"></label>
-            <textarea asp-for="Description" class="form-control" rows="6"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
+        <div>
+            <label asp-for="Description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+            <textarea asp-for="Description" rows="6" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+            <span asp-validation-for="Description" class="text-sm text-red-500"></span>
         </div>
-        <div class="form-group">
-            <label asp-for="Qualifications"></label>
-            <textarea asp-for="Qualifications" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Qualifications" class="text-danger"></span>
+        <div>
+            <label asp-for="Qualifications" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+            <textarea asp-for="Qualifications" rows="3" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+            <span asp-validation-for="Qualifications" class="text-sm text-red-500"></span>
         </div>
-        <div class="form-group">
-            <label asp-for="Experience"></label>
-            <textarea asp-for="Experience" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Experience" class="text-danger"></span>
+        <div>
+            <label asp-for="Experience" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+            <textarea asp-for="Experience" rows="3" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+            <span asp-validation-for="Experience" class="text-sm text-red-500"></span>
         </div>
-        <div class="form-group">
-            <label asp-for="Skills"></label>
-            <textarea asp-for="Skills" class="form-control" rows="2"></textarea>
-            <span asp-validation-for="Skills" class="text-danger"></span>
+        <div>
+            <label asp-for="Skills" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+            <textarea asp-for="Skills" rows="2" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+            <span asp-validation-for="Skills" class="text-sm text-red-500"></span>
         </div>
     </div>
-    <div class="col-lg-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-header">
-                <h2 class="h6 mb-0">Listing details</h2>
+    <aside class="space-y-6">
+        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 shadow-sm">
+            <div class="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+                <h2 class="text-sm font-semibold tracking-wide text-gray-600 dark:text-gray-300">Listing details</h2>
             </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label asp-for="JobType"></label>
-                    <input asp-for="JobType" class="form-control" />
-                    <span asp-validation-for="JobType" class="text-danger"></span>
+            <div class="space-y-4 p-4">
+                <div>
+                    <label asp-for="JobType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+                    <input asp-for="JobType" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                    <span asp-validation-for="JobType" class="text-sm text-red-500"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Salary"></label>
-                    <input asp-for="Salary" class="form-control" />
-                    <span asp-validation-for="Salary" class="text-danger"></span>
+                <div>
+                    <label asp-for="Salary" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+                    <input asp-for="Salary" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                    <span asp-validation-for="Salary" class="text-sm text-red-500"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Location"></label>
-                    <input asp-for="Location" class="form-control" />
-                    <span asp-validation-for="Location" class="text-danger"></span>
+                <div>
+                    <label asp-for="Location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+                    <input asp-for="Location" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                    <span asp-validation-for="Location" class="text-sm text-red-500"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Country"></label>
-                    <input asp-for="Country" class="form-control" />
-                    <span asp-validation-for="Country" class="text-danger"></span>
+                <div>
+                    <label asp-for="Country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"></label>
+                    <input asp-for="Country" class="block w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg py-2.5 px-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
+                    <span asp-validation-for="Country" class="text-sm text-red-500"></span>
                 </div>
-                <div class="form-group form-check">
-                    <input asp-for="IsActive" class="form-check-input" />
-                    <label asp-for="IsActive" class="form-check-label">Active listing</label>
+                <div class="flex items-center gap-2">
+                    <input asp-for="IsActive" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
+                    <label asp-for="IsActive" class="text-sm text-gray-700 dark:text-gray-300">Active listing</label>
                 </div>
             </div>
         </div>
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h2 class="h6 mb-0">Company snapshot</h2>
+        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 shadow-sm">
+            <div class="border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+                <h2 class="text-sm font-semibold tracking-wide text-gray-600 dark:text-gray-300">Company snapshot</h2>
             </div>
-            <div class="card-body">
-                <p><strong>@Model.ProviderCompanyName</strong></p>
+            <div class="p-4 text-sm text-gray-600 dark:text-gray-300">
+                <p class="font-semibold text-gray-900 dark:text-gray-100">@Model.ProviderCompanyName</p>
                 @if (!string.IsNullOrWhiteSpace(Model.ProviderCompanyLocation))
                 {
-                    <p class="mb-1 text-muted">@Model.ProviderCompanyLocation</p>
+                    <p class="mt-1 text-gray-500 dark:text-gray-400">@Model.ProviderCompanyLocation</p>
                 }
                 @if (!string.IsNullOrWhiteSpace(Model.ProviderCompanyWebsite))
                 {
-                    <p class="mb-1"><a href="@Model.ProviderCompanyWebsite" target="_blank" rel="noopener">@Model.ProviderCompanyWebsite</a></p>
+                    <p class="mt-1"><a href="@Model.ProviderCompanyWebsite" target="_blank" rel="noopener" class="text-primary hover:underline">@Model.ProviderCompanyWebsite</a></p>
                 }
                 @if (!string.IsNullOrWhiteSpace(Model.ProviderCompanyDescription))
                 {
-                    <p class="small text-muted">@Model.ProviderCompanyDescription</p>
+                    <p class="mt-3 leading-relaxed">@Model.ProviderCompanyDescription</p>
                 }
             </div>
         </div>
-    </div>
+    </aside>
 </div>

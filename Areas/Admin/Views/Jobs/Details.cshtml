@@ -2,104 +2,112 @@
 @{
     ViewData["Title"] = "Job details";
 }
-<section class="admin-job-detail">
-    <a asp-area="Admin" asp-controller="Jobs" asp-action="Index" class="btn btn-link mb-3">← Back to jobs</a>
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <h1 class="h4">@Model.Title</h1>
-                    <p class="text-muted mb-2">@Model.CompanyName · @Model.Location</p>
-                    <div class="mb-3">
-                        <span class="badge badge-secondary mr-2">@Model.JobType</span>
-                        <span class="text-muted">Posted @Model.PostedAt.ToLocalTime():f</span>
-                    </div>
+<section class="space-y-4">
+    <a asp-area="Admin" asp-controller="Jobs" asp-action="Index" class="btn btn-secondary w-fit">← Back to jobs</a>
+    <div class="card space-y-6 p-8">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div class="space-y-2">
+                <h1 class="text-2xl font-semibold text-slate-900">@Model.Title</h1>
+                <p class="text-sm text-slate-500">@Model.CompanyName · @Model.Location</p>
+                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                    <span class="pill bg-primary-50 text-primary-600">@Model.JobType</span>
+                    <span>Posted @Model.PostedAt.ToLocalTime():f</span>
                 </div>
-                @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoPath))
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoPath))
+            {
+                <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName logo" class="h-16 w-16 rounded-full border border-slate-200 object-cover" />
+            }
+        </div>
+        <div class="grid gap-8 lg:grid-cols-2">
+            <div class="space-y-4 text-sm text-slate-600">
+                <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Role overview</h2>
+                <p>@Html.Raw(Model.Description?.Replace("\n", "<br />"))</p>
+                @if (!string.IsNullOrWhiteSpace(Model.Qualifications))
                 {
-                    <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName logo" style="max-height:80px;" />
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-600">Qualifications</h3>
+                        <p class="mt-1">@Html.Raw(Model.Qualifications?.Replace("\n", "<br />"))</p>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Experience))
+                {
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-600">Experience</h3>
+                        <p class="mt-1">@Html.Raw(Model.Experience?.Replace("\n", "<br />"))</p>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Skills))
+                {
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-600">Skills</h3>
+                        <p class="mt-1">@Html.Raw(Model.Skills?.Replace("\n", "<br />"))</p>
+                    </div>
                 }
             </div>
-            <p>@Html.Raw(Model.Description?.Replace("\n", "<br />"))</p>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <h2 class="h6 text-uppercase text-muted">Requirements</h2>
-                    @if (!string.IsNullOrWhiteSpace(Model.Qualifications))
-                    {
-                        <p>@Html.Raw(Model.Qualifications?.Replace("\n", "<br />"))</p>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(Model.Experience))
-                    {
-                        <p>@Html.Raw(Model.Experience?.Replace("\n", "<br />"))</p>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(Model.Skills))
-                    {
-                        <p>@Html.Raw(Model.Skills?.Replace("\n", "<br />"))</p>
-                    }
-                </div>
-                <div class="col-md-6">
-                    <h2 class="h6 text-uppercase text-muted">Listing info</h2>
-                    <ul class="list-unstyled">
-                        <li><strong>Status:</strong> @(Model.IsActive ? "Active" : "Hidden")</li>
-                        <li><strong>Salary:</strong> @Model.Salary</li>
-                        <li><strong>Country:</strong> @Model.Country</li>
+            <div class="space-y-6">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-6 text-sm text-slate-600">
+                    <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Listing info</h2>
+                    <ul class="mt-4 space-y-3">
+                        <li class="flex justify-between gap-4"><span>Status:</span><span class="font-medium text-slate-900">@(Model.IsActive ? "Active" : "Hidden")</span></li>
+                        <li class="flex justify-between gap-4"><span>Salary:</span><span class="font-medium text-slate-900">@Model.Salary</span></li>
+                        <li class="flex justify-between gap-4"><span>Country:</span><span class="font-medium text-slate-900">@Model.Country</span></li>
                         @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
                         {
-                            <li><strong>Website:</strong> <a href="@Model.CompanyWebsite" target="_blank" rel="noopener">@Model.CompanyWebsite</a></li>
+                            <li class="flex justify-between gap-4"><span>Website:</span><span><a href="@Model.CompanyWebsite" target="_blank" rel="noopener" class="font-medium text-primary-600 hover:text-primary-700">@Model.CompanyWebsite</a></span></li>
                         }
                     </ul>
                 </div>
+                @if (Model.Provider != null)
+                {
+                    <div class="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Provider</h2>
+                        <p class="mt-2 text-base font-semibold text-slate-900">@(Model.Provider.CompanyName ?? Model.Provider.FullName)</p>
+                        @if (!string.IsNullOrWhiteSpace(Model.Provider.CompanyDescription))
+                        {
+                            <p class="mt-1 text-slate-500">@Model.Provider.CompanyDescription</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.Provider.CompanyWebsite))
+                        {
+                            <a href="@Model.Provider.CompanyWebsite" target="_blank" rel="noopener" class="mt-2 inline-flex text-sm font-medium text-primary-600 hover:text-primary-700">@Model.Provider.CompanyWebsite</a>
+                        }
+                    </div>
+                }
             </div>
-
-            @if (Model.Provider != null)
-            {
-                <hr />
-                <h2 class="h5">Provider</h2>
-                <p><strong>@(Model.Provider.CompanyName ?? Model.Provider.FullName)</strong></p>
-                @if (!string.IsNullOrWhiteSpace(Model.Provider.CompanyDescription))
-                {
-                    <p class="text-muted">@Model.Provider.CompanyDescription</p>
-                }
-                @if (!string.IsNullOrWhiteSpace(Model.Provider.CompanyWebsite))
-                {
-                    <p class="small"><a href="@Model.Provider.CompanyWebsite" target="_blank" rel="noopener">@Model.Provider.CompanyWebsite</a></p>
-                }
-            }
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h2 class="h6 mb-0">Applications (@Model.Applications?.Count ?? 0)</h2>
+    <div class="card overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Applications (@Model.Applications?.Count ?? 0)</h2>
         </div>
-        <div class="table-responsive">
-            <table class="table mb-0">
-                <thead>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-50">
                     <tr>
-                        <th>Applicant</th>
-                        <th>Email</th>
-                        <th>Applied</th>
-                        <th>Status</th>
+                        <th class="px-6 py-3 font-medium text-slate-500">Applicant</th>
+                        <th class="px-6 py-3 font-medium text-slate-500">Email</th>
+                        <th class="px-6 py-3 font-medium text-slate-500">Applied</th>
+                        <th class="px-6 py-3 font-medium text-slate-500">Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 text-slate-600">
                     @if (Model.Applications?.Any() == true)
                     {
                         foreach (var app in Model.Applications.OrderByDescending(a => a.AppliedAt))
                         {
-                            <tr>
-                                <td>@(app.Applicant?.FullName ?? app.Applicant?.UserName)</td>
-                                <td>@app.Applicant?.Email</td>
-                                <td>@app.AppliedAt.ToLocalTime():g</td>
-                                <td>@app.Status</td>
+                            <tr class="hover:bg-slate-50/60">
+                                <td class="px-6 py-4">@(app.Applicant?.FullName ?? app.Applicant?.UserName)</td>
+                                <td class="px-6 py-4">@app.Applicant?.Email</td>
+                                <td class="px-6 py-4">@app.AppliedAt.ToLocalTime():g</td>
+                                <td class="px-6 py-4"><span class="pill bg-primary-50 text-primary-600">@app.Status</span></td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-3">No applications yet.</td>
+                            <td colspan="4" class="px-6 py-8 text-center text-slate-400">No applications yet.</td>
                         </tr>
                     }
                 </tbody>

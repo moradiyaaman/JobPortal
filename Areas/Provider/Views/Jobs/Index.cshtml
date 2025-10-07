@@ -1,69 +1,78 @@
 @model IEnumerable<ProviderJobListItemViewModel>
 @{
-    ViewData["Title"] = "My job postings";
+    ViewData["Title"] = "Manage Job Postings";
 }
-<section class="jobs-index">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-0">@ViewData["Title"]</h1>
-            <p class="text-muted mb-0">Manage the roles posted by @ViewBag.CompanyName.</p>
-        </div>
-        <a asp-area="Provider" asp-controller="Jobs" asp-action="Create" class="btn btn-primary">Post a job</a>
-    </div>
+<div class="flex min-h-screen flex-col">
+    <main class="flex-1">
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div class="mb-6 flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">@ViewData["Title"]</h1>
+                <a asp-area="Provider" asp-controller="Jobs" asp-action="Create" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">Post a Job</a>
+            </div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
+            @if (TempData["Success"] != null)
+            {
+                <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">@TempData["Success"]</div>
+            }
 
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table mb-0">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Posted</th>
-                        <th>Status</th>
-                        <th>Applications</th>
-                        <th class="text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Any())
-                    {
-                        foreach (var job in Model)
-                        {
+            <div class="overflow-hidden rounded-lg border border-gray-200 bg-background-light shadow-sm dark:border-gray-800 dark:bg-background-dark">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                        <thead class="bg-gray-50 dark:bg-gray-800/50">
                             <tr>
-                                <td>
-                                    <strong>@job.Title</strong>
-                                </td>
-                                <td>@job.PostedAt.ToLocalTime():d</td>
-                                <td>
-                                    <span class="badge @(job.IsActive ? "badge-success" : "badge-secondary")">@(job.IsActive ? "Active" : "Paused")</span>
-                                </td>
-                                <td>@job.ApplicationCount</td>
-                                <td class="text-right">
-                                    <a asp-area="Provider" asp-controller="Jobs" asp-action="Edit" asp-route-id="@job.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                    <form asp-area="Provider" asp-controller="Jobs" asp-action="ToggleStatus" asp-route-id="@job.Id" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-outline-warning">@(job.IsActive ? "Pause" : "Activate")</button>
-                                    </form>
-                                    <form asp-area="Provider" asp-controller="Jobs" asp-action="Delete" asp-route-id="@job.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this job?');">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
-                                </td>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Job Title</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Date Posted</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Applicants</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+                                <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
                             </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">You have not posted any jobs yet.</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-background-light dark:divide-gray-800 dark:bg-background-dark">
+                            @if (Model.Any())
+                            {
+                                foreach (var job in Model)
+                                {
+                                    <tr>
+                                        <td class="whitespace-nowrap px-6 py-4">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">@job.Title</div>
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">@job.PostedAt.ToLocalTime():yyyy-MM-dd</td>
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">@job.ApplicationCount</td>
+                                        <td class="whitespace-nowrap px-6 py-4">
+                                            @if (job.IsActive)
+                                            {
+                                                <span class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900/50 dark:text-green-300">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="inline-flex rounded-full bg-red-100 px-2 text-xs font-semibold leading-5 text-red-800 dark:bg-red-900/50 dark:text-red-300">Paused</span>
+                                            }
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium space-x-3">
+                                            <a asp-area="Provider" asp-controller="Jobs" asp-action="Applications" asp-route-id="@job.Id" class="text-primary hover:text-primary/80">Applicants</a>
+                                            <a asp-area="Provider" asp-controller="Jobs" asp-action="Edit" asp-route-id="@job.Id" class="text-primary hover:text-primary/80">Edit</a>
+                                            <form asp-area="Provider" asp-controller="Jobs" asp-action="ToggleStatus" asp-route-id="@job.Id" method="post" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200">@(job.IsActive ? "Pause" : "Activate")</button>
+                                            </form>
+                                            <form asp-area="Provider" asp-controller="Jobs" asp-action="Delete" asp-route-id="@job.Id" method="post" class="inline" onsubmit="return confirm('Delete this job?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">You have not posted any jobs yet.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
-</section>
+    </main>
+</div>

@@ -1,27 +1,34 @@
 ﻿@{
     ViewData["Title"] = "Privacy";
 }
-<section class="page-header">
-    <div>
-        <h1>Privacy policy</h1>
-        <p class="text-muted">We respect your data and use it responsibly. Here's how.</p>
-    </div>
+<section class="flex flex-col gap-3">
+    <p class="text-xs uppercase tracking-[0.2em] text-primary-500">Privacy</p>
+    <h1 class="text-3xl font-semibold text-slate-900">Privacy policy</h1>
+    <p class="text-slate-500">We respect your data and use it responsibly. Here's how.</p>
 </section>
 
-<section class="card card--padded">
-    <h2>Information we collect</h2>
-    <p>We collect profile details, resumes, and application activity to connect job seekers with employers. Contact messages are stored so our team can respond.</p>
+<section class="card mt-8 space-y-10 p-8">
+    <div class="space-y-3">
+        <h2 class="text-xl font-semibold text-slate-900">Information we collect</h2>
+        <p class="text-sm text-slate-600">We collect profile details, resumes, and application activity to connect job seekers with employers. Contact messages are stored so our team can respond.</p>
+    </div>
 
-    <h2>How we use your data</h2>
-    <ul>
-        <li>Match candidates with job postings and track application status.</li>
-        <li>Enable administrators to review applications and manage listings.</li>
-        <li>Deliver support responses and service updates.</li>
-    </ul>
+    <div class="space-y-3">
+        <h2 class="text-xl font-semibold text-slate-900">How we use your data</h2>
+        <ul class="list-disc space-y-2 pl-5 text-sm text-slate-600">
+            <li>Match candidates with job postings and track application status.</li>
+            <li>Enable administrators to review applications and manage listings.</li>
+            <li>Deliver support responses and service updates.</li>
+        </ul>
+    </div>
 
-    <h2>Your choices</h2>
-    <p>Update or remove profile information anytime from your account settings. For data deletion requests, use the <a asp-controller="Contact" asp-action="Index">contact form</a>.</p>
+    <div class="space-y-3">
+        <h2 class="text-xl font-semibold text-slate-900">Your choices</h2>
+        <p class="text-sm text-slate-600">Update or remove profile information anytime from your account settings. For data deletion requests, use the <a asp-controller="Contact" asp-action="Index" class="font-medium text-primary-600 hover:text-primary-700">contact form</a>.</p>
+    </div>
 
-    <h2>Security</h2>
-    <p>Passwords are encrypted using industry-standard hashing. We monitor for suspicious activity and apply best practices to protect your data.</p>
+    <div class="space-y-3">
+        <h2 class="text-xl font-semibold text-slate-900">Security</h2>
+        <p class="text-sm text-slate-600">Passwords are encrypted using industry-standard hashing. We monitor for suspicious activity and apply best practices to protect your data.</p>
+    </div>
 </section>

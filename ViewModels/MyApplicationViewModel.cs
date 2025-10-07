@@ -1,4 +1,4 @@
-using System;
+    using System;
 
 namespace JobPortal.ViewModels
 {
@@ -10,5 +10,6 @@ namespace JobPortal.ViewModels
         public string Location { get; set; }
         public DateTime AppliedAt { get; set; }
         public string Status { get; set; }
+        public string CoverLetter { get; set; }
     }
 }

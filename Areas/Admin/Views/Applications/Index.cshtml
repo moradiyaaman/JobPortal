@@ -1,47 +1,82 @@
 @model IEnumerable<JobPortal.Models.JobApplication>
 @{
     ViewData["Title"] = "Applications";
+    var statusOptions = ViewBag.StatusOptions as string[] ?? Array.Empty<string>();
 }
-<section class="page-header">
+<section class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
     <div>
-        <h1>All applications</h1>
-        <p class="text-muted">Review recent job applications and respond promptly.</p>
+        <h1 class="text-3xl font-semibold text-slate-900">All applications</h1>
+        <p class="text-sm text-slate-500">Monitor submissions across every listing and keep candidates in the loop.</p>
     </div>
 </section>
 
-<table class="table table--responsive">
-    <thead>
-        <tr>
-            <th>Job</th>
-            <th>Applicant</th>
-            <th>Email</th>
-            <th>Applied</th>
-            <th>Status</th>
-            <th>Resume</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var application in Model)
-    {
-        <tr>
-            <td data-label="Job">
-                <a asp-area="" asp-controller="Jobs" asp-action="Details" asp-route-id="@application.JobId">@application.Job.Title</a>
-            </td>
-            <td data-label="Applicant">@application.Applicant.FullName</td>
-            <td data-label="Email">@application.Applicant.Email</td>
-            <td data-label="Applied">@application.AppliedAt.ToString("MMM d, yyyy")</td>
-            <td data-label="Status"><span class="status-pill">@application.Status</span></td>
-            <td data-label="Resume">
-                @if (!string.IsNullOrEmpty(application.Applicant.ResumeFileName))
+@if (TempData["Error"] != null)
+{
+    <div class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">@TempData["Success"]</div>
+}
+
+@if (!(Model?.Any() ?? false))
+{
+    <div class="card mt-10 border border-dashed border-slate-200 px-6 py-12 text-center text-slate-500">
+        <h3 class="text-lg font-semibold text-slate-700">No applications yet</h3>
+        <p class="mt-1 text-sm">Encourage providers to share their job posts to capture more interest.</p>
+    </div>
+}
+else
+{
+    <div class="mt-8 space-y-5">
+        @foreach (var application in Model)
+        {
+            <article class="card space-y-5 p-6">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-slate-400">@application.AppliedAt.ToString("MMM d, yyyy")</p>
+                        <h2 class="text-xl font-semibold text-slate-900">
+                            <a asp-area="" asp-controller="Jobs" asp-action="Details" asp-route-id="@application.JobId" class="hover:underline">@application.Job?.Title</a>
+                        </h2>
+                        <p class="text-sm text-slate-500">@application.Applicant?.FullName ?? application.Applicant?.Email</p>
+                        <p class="text-xs text-slate-400">@application.Applicant?.Email</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="pill bg-primary-50 text-primary-600">@application.Status</span>
+                        @if (!string.IsNullOrWhiteSpace(application.Applicant?.ResumeFileName))
+                        {
+                            <a href="@application.Applicant.ResumeFileName" target="_blank" class="btn btn-secondary">Resume</a>
+                        }
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(application.CoverLetter))
                 {
-                    <a href="@application.Applicant.ResumeFileName" target="_blank" class="btn btn-secondary">Download</a>
+                    <div class="rounded-xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600">
+                        <p class="font-medium text-slate-500">Cover letter</p>
+                        <p class="mt-2 whitespace-pre-line">@application.CoverLetter</p>
+                    </div>
                 }
-                else
-                {
-                    <span class="text-muted">Not uploaded</span>
-                }
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+
+                <form asp-action="UpdateStatus" method="post" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@application.Id" />
+                    <div class="input-group sm:w-1/3">
+                        <label class="text-sm font-medium text-slate-600">Update status</label>
+                        <select name="status" class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                            @foreach (var status in statusOptions)
+                            {
+                                <option value="@status" selected="@(status == application.Status ? "selected" : null)">@status</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary sm:w-auto">Save changes</button>
+                </form>
+            </article>
+        }
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

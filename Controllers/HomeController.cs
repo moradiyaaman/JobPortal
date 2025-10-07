@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using JobPortal.Data;
 using JobPortal.Models;
@@ -40,12 +41,30 @@ namespace JobPortal.Controllers
                 })
                 .ToListAsync();
 
+            string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ApplicationUser currentUser = null;
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                currentUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == currentUserId);
+            }
+
             var stats = new HomeStatsViewModel
             {
                 TotalJobs = await _context.Jobs.CountAsync(j => j.IsActive),
                 TotalApplications = await _context.JobApplications.CountAsync(),
                 TotalUsers = await _context.Users.CountAsync(),
-                RecentJobs = jobs
+                RecentJobs = jobs,
+                CurrentUserName = !string.IsNullOrWhiteSpace(currentUser?.FullName)
+                    ? currentUser.FullName
+                    : currentUser?.UserName ?? User.Identity?.Name,
+                CurrentUserRoleLabel = User.IsInRole("Admin")
+                    ? "Admin"
+                    : User.IsInRole("Provider") || currentUser?.IsProvider == true
+                        ? "Provider"
+                        : User.Identity?.IsAuthenticated == true
+                            ? "Job Seeker"
+                            : "Guest",
+                ProfileAvatarUrl = currentUser?.CompanyLogoPath
             };
 
             return View(stats);

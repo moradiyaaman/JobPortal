@@ -27,5 +27,7 @@ namespace JobPortal.Models
 
         public ICollection<JobApplication> Applications { get; set; }
         public ICollection<Job> JobsPosted { get; set; }
+        public ICollection<SavedJob> SavedJobs { get; set; }
+        public ICollection<JobAlertSubscription> JobAlerts { get; set; }
     }
 }

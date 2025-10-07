@@ -17,15 +17,7 @@ namespace JobPortal.Data
 
             var context = scopedServices.GetRequiredService<ApplicationDbContext>();
 
-            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-            if (pendingMigrations.Any())
-            {
-                await context.Database.MigrateAsync();
-            }
-            else
-            {
-                await context.Database.EnsureCreatedAsync();
-            }
+            await context.Database.MigrateAsync();
 
             var roleManager = scopedServices.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = scopedServices.GetRequiredService<UserManager<ApplicationUser>>();

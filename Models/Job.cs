@@ -59,5 +59,6 @@ namespace JobPortal.Models
         public bool IsActive { get; set; } = true;
 
         public ICollection<JobApplication> Applications { get; set; }
+        public ICollection<SavedJob> SavedByUsers { get; set; }
     }
 }

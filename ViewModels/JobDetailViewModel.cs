@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace JobPortal.ViewModels
 {
@@ -21,6 +20,8 @@ namespace JobPortal.ViewModels
         public DateTime PostedAt { get; set; }
         public bool IsApplied { get; set; }
         public bool CanApply { get; set; }
+        public bool CanSave { get; set; }
+        public bool IsSaved { get; set; }
         public string ProviderDisplayName { get; set; }
         public string ProviderSummary { get; set; }
         public string ProviderWebsite { get; set; }

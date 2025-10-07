@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JobPortal.Configuration;
 using JobPortal.Data;
 using JobPortal.Models;
+using JobPortal.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -48,6 +50,10 @@ namespace JobPortal
             });
 
             services.AddControllersWithViews();
+
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            services.AddTransient<IEmailService, SmtpEmailService>();
+            services.AddHostedService<JobAlertDispatcher>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -2,69 +2,67 @@
 @{
     ViewData["Title"] = "Dashboard";
 }
-<section class="page-header">
-    <div>
-        <h1>Admin dashboard</h1>
-        <p class="text-muted">Monitor platform activity and respond to applicants faster.</p>
-    </div>
+<section class="space-y-3">
+    <h1 class="text-3xl font-semibold text-slate-900">Admin dashboard</h1>
+    <p class="text-sm text-slate-500">Monitor platform activity and respond to applicants faster.</p>
 </section>
 
-<div class="admin-stats-grid">
-    <div class="stat-card">
-        <span>Total jobs</span>
-        <strong>@Model.TotalJobs</strong>
+<div class="grid gap-5 pt-6 md:grid-cols-2 xl:grid-cols-4">
+    <div class="card space-y-2 p-6">
+        <p class="text-xs uppercase tracking-wide text-slate-400">Total jobs</p>
+        <p class="text-3xl font-semibold text-slate-900">@Model.TotalJobs</p>
     </div>
-    <div class="stat-card">
-        <span>Active jobs</span>
-        <strong>@Model.ActiveJobs</strong>
+    <div class="card space-y-2 p-6">
+        <p class="text-xs uppercase tracking-wide text-slate-400">Active jobs</p>
+        <p class="text-3xl font-semibold text-slate-900">@Model.ActiveJobs</p>
     </div>
-    <div class="stat-card">
-        <span>Applications</span>
-        <strong>@Model.TotalApplications</strong>
+    <div class="card space-y-2 p-6">
+        <p class="text-xs uppercase tracking-wide text-slate-400">Applications</p>
+        <p class="text-3xl font-semibold text-slate-900">@Model.TotalApplications</p>
     </div>
-    <div class="stat-card">
-        <span>Job seekers</span>
-        <strong>@Model.TotalUsers</strong>
+    <div class="card space-y-2 p-6">
+        <p class="text-xs uppercase tracking-wide text-slate-400">Job seekers</p>
+        <p class="text-3xl font-semibold text-slate-900">@Model.TotalUsers</p>
     </div>
-    <div class="stat-card">
-        <span>Contact messages</span>
-        <strong>@Model.ContactMessagesCount</strong>
+    <div class="card space-y-2 p-6 md:col-span-2 xl:col-span-4">
+        <p class="text-xs uppercase tracking-wide text-slate-400">Contact messages</p>
+        <p class="text-3xl font-semibold text-slate-900">@Model.ContactMessagesCount</p>
     </div>
 </div>
 
-<section class="card card--padded mt-5">
-    <div class="section__header">
-        <h2>Recent applications</h2>
-        <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="link">View all</a>
+<section class="card mt-8 overflow-hidden">
+    <div class="flex flex-col gap-3 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Recent applications</h2>
+        <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="btn btn-secondary">View all</a>
     </div>
     @if (!(Model.RecentApplications?.Any() ?? false))
     {
-        <div class="empty-state">
-            <h3>No applications yet</h3>
-        </div>
+        <div class="px-6 py-12 text-center text-sm text-slate-500">No applications yet.</div>
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Job</th>
-                    <th>Applicant</th>
-                    <th>Applied at</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var application in Model.RecentApplications)
-            {
-                <tr>
-                    <td>@application.JobTitle</td>
-                    <td>@application.ApplicantName</td>
-                    <td>@application.AppliedAt.ToString("MMM d, yyyy")</td>
-                    <td><span class="status-pill">@application.Status</span></td>
-                </tr>
-            }
-            </tbody>
-        </table>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-6 py-3 font-medium text-slate-500">Job</th>
+                        <th class="px-6 py-3 font-medium text-slate-500">Applicant</th>
+                        <th class="px-6 py-3 font-medium text-slate-500">Applied</th>
+                        <th class="px-6 py-3 font-medium text-slate-500">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var application in Model.RecentApplications)
+                    {
+                        <tr class="hover:bg-slate-50/60">
+                            <td class="px-6 py-4 text-slate-700">@application.JobTitle</td>
+                            <td class="px-6 py-4 text-slate-500">@application.ApplicantName</td>
+                            <td class="px-6 py-4 text-slate-500">@application.AppliedAt.ToString("MMM d, yyyy")</td>
+                            <td class="px-6 py-4"><span class="pill bg-primary-50 text-primary-600">@application.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 </section>

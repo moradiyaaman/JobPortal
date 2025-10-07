@@ -1,0 +1,102 @@
+@model ManageJobAlertsViewModel
+@{
+    ViewData["Title"] = "Job alerts";
+}
+<section class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-3xl font-semibold text-slate-900">Job alerts</h1>
+        <p class="text-sm text-slate-500">Tell us what you're looking for and we'll email new matches automatically.</p>
+    </div>
+    <a asp-action="Saved" class="btn btn-secondary">Saved jobs</a>
+</section>
+
+@if (TempData["Error"] != null)
+{
+    <div class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">@TempData["Success"]</div>
+}
+@if (TempData["Info"] != null)
+{
+    <div class="mt-6 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-600">@TempData["Info"]</div>
+}
+
+<section class="card mt-8 space-y-6 p-8">
+    <h2 class="text-xl font-semibold text-slate-900">Create a new alert</h2>
+    <form asp-action="CreateAlert" method="post" class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        @Html.AntiForgeryToken()
+        <div class="input-group xl:col-span-2">
+            <label asp-for="NewAlert.Keyword" class="text-sm font-medium text-slate-600"></label>
+            <input asp-for="NewAlert.Keyword" class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" placeholder="Growth marketing, .NET developer..." />
+            <span asp-validation-for="NewAlert.Keyword" class="text-xs text-red-500"></span>
+        </div>
+        <div class="input-group">
+            <label asp-for="NewAlert.Country" class="text-sm font-medium text-slate-600"></label>
+            <select asp-for="NewAlert.Country" class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <option value="">Any</option>
+                @foreach (var country in Model.AvailableCountries ?? Enumerable.Empty<string>())
+                {
+                    <option value="@country">@country</option>
+                }
+            </select>
+            <span asp-validation-for="NewAlert.Country" class="text-xs text-red-500"></span>
+        </div>
+        <div class="input-group">
+            <label asp-for="NewAlert.JobType" class="text-sm font-medium text-slate-600"></label>
+            <select asp-for="NewAlert.JobType" class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <option value="">Any</option>
+                @foreach (var jobType in Model.AvailableJobTypes ?? Enumerable.Empty<string>())
+                {
+                    <option value="@jobType">@jobType</option>
+                }
+            </select>
+            <span asp-validation-for="NewAlert.JobType" class="text-xs text-red-500"></span>
+        </div>
+        <div class="flex items-end justify-end">
+            <button type="submit" class="btn btn-primary">Create alert</button>
+        </div>
+    </form>
+    <p class="text-xs text-slate-400">Add at least one filter to keep alerts focused. We'll scan for new jobs every hour.</p>
+</section>
+
+@if (!(Model.Alerts?.Any() ?? false))
+{
+    <div class="card mt-8 border border-dashed border-slate-200 px-6 py-12 text-center text-slate-500">
+        <h3 class="text-lg font-semibold text-slate-700">No alerts yet</h3>
+        <p class="mt-1 text-sm">Create an alert above and you'll get notified when new roles match.</p>
+    </div>
+}
+else
+{
+    <div class="mt-8 space-y-4">
+        @foreach (var alert in Model.Alerts)
+        {
+            <article class="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+                <div class="space-y-2">
+                    <p class="text-xs uppercase tracking-wide text-slate-400">Created @alert.CreatedAt.ToString("MMM d, yyyy")</p>
+                    <h3 class="text-lg font-semibold text-slate-900">@(!string.IsNullOrWhiteSpace(alert.Keyword) ? alert.Keyword : "Any keyword")</h3>
+                    <div class="flex flex-wrap gap-2 text-xs text-slate-500">
+                        <span class="pill bg-slate-100 text-slate-600">@(string.IsNullOrWhiteSpace(alert.Country) ? "Any country" : alert.Country)</span>
+                        <span class="pill bg-slate-100 text-slate-600">@(string.IsNullOrWhiteSpace(alert.JobType) ? "Any job type" : alert.JobType)</span>
+                        <span class="pill bg-primary-50 text-primary-600">@alert.MatchesSinceLastNotification new</span>
+                    </div>
+                    @if (alert.LastNotifiedAt != null)
+                    {
+                        <p class="text-xs text-slate-400">Last email sent @alert.LastNotifiedAt.Value.ToString("MMM d, h:mm tt")</p>
+                    }
+                </div>
+                <form asp-action="DeleteAlert" method="post" class="inline-flex">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@alert.Id" />
+                    <button type="submit" class="btn btn-secondary">Remove</button>
+                </form>
+            </article>
+        }
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
