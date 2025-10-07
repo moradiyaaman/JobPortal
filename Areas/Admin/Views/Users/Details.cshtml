@@ -1,0 +1,63 @@
+@model AdminUserDetailsViewModel
+@{
+    ViewData["Title"] = "User details";
+}
+<section class="user-details">
+    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-link mb-3">← Back to users</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h4">@Model.UserName</h1>
+            <p class="text-muted mb-3">@Model.Email</p>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="h6 text-uppercase text-muted">Profile</h2>
+                    <dl class="row">
+                        <dt class="col-sm-4">Full name</dt>
+                        <dd class="col-sm-8">@Model.FullName</dd>
+                        <dt class="col-sm-4">Mobile</dt>
+                        <dd class="col-sm-8">@Model.Mobile</dd>
+                        <dt class="col-sm-4">Country</dt>
+                        <dd class="col-sm-8">@Model.Country</dd>
+                        <dt class="col-sm-4">Address</dt>
+                        <dd class="col-sm-8">@Model.Address</dd>
+                        <dt class="col-sm-4">Headline</dt>
+                        <dd class="col-sm-8">@Model.Headline</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="h6 text-uppercase text-muted">Account</h2>
+                    <ul class="list-unstyled">
+                        <li><strong>Roles:</strong> @(Model.IsAdmin ? "Admin" : "User") @(Model.IsProvider ? ", Provider" : string.Empty)</li>
+                        <li><strong>Email confirmed:</strong> @(Model.EmailConfirmed ? "Yes" : "No")</li>
+                        <li><strong>Locked out:</strong> @(Model.IsLockedOut ? "Yes" : "No")</li>
+                        <li><strong>Joined:</strong> @Model.CreatedAt.ToLocalTime():f</li>
+                        <li><strong>Jobs posted:</strong> @Model.JobsPosted</li>
+                        <li><strong>Applications:</strong> @Model.ApplicationsSubmitted</li>
+                    </ul>
+                </div>
+            </div>
+
+            @if (Model.IsProvider)
+            {
+                <hr />
+                <h2 class="h5">Company details</h2>
+                <dl class="row">
+                    <dt class="col-sm-3">Company</dt>
+                    <dd class="col-sm-9">@Model.CompanyName</dd>
+                    <dt class="col-sm-3">Website</dt>
+                    <dd class="col-sm-9">
+                        @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
+                        {
+                            <a href="@Model.CompanyWebsite" target="_blank" rel="noopener">@Model.CompanyWebsite</a>
+                        }
+                    </dd>
+                    <dt class="col-sm-3">Location</dt>
+                    <dd class="col-sm-9">@Model.CompanyLocation</dd>
+                    <dt class="col-sm-3">About</dt>
+                    <dd class="col-sm-9">@Model.CompanyDescription</dd>
+                </dl>
+            }
+        </div>
+    </div>
+</section>

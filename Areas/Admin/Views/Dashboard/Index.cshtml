@@ -1,0 +1,70 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<section class="page-header">
+    <div>
+        <h1>Admin dashboard</h1>
+        <p class="text-muted">Monitor platform activity and respond to applicants faster.</p>
+    </div>
+</section>
+
+<div class="admin-stats-grid">
+    <div class="stat-card">
+        <span>Total jobs</span>
+        <strong>@Model.TotalJobs</strong>
+    </div>
+    <div class="stat-card">
+        <span>Active jobs</span>
+        <strong>@Model.ActiveJobs</strong>
+    </div>
+    <div class="stat-card">
+        <span>Applications</span>
+        <strong>@Model.TotalApplications</strong>
+    </div>
+    <div class="stat-card">
+        <span>Job seekers</span>
+        <strong>@Model.TotalUsers</strong>
+    </div>
+    <div class="stat-card">
+        <span>Contact messages</span>
+        <strong>@Model.ContactMessagesCount</strong>
+    </div>
+</div>
+
+<section class="card card--padded mt-5">
+    <div class="section__header">
+        <h2>Recent applications</h2>
+        <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="link">View all</a>
+    </div>
+    @if (!(Model.RecentApplications?.Any() ?? false))
+    {
+        <div class="empty-state">
+            <h3>No applications yet</h3>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Job</th>
+                    <th>Applicant</th>
+                    <th>Applied at</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var application in Model.RecentApplications)
+            {
+                <tr>
+                    <td>@application.JobTitle</td>
+                    <td>@application.ApplicantName</td>
+                    <td>@application.AppliedAt.ToString("MMM d, yyyy")</td>
+                    <td><span class="status-pill">@application.Status</span></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</section>

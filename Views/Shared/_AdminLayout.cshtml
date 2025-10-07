@@ -1,0 +1,43 @@
+@{
+    Layout = null;
+    var title = ViewData["Title"] as string ?? "Admin";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title · Admin · Online Job Portal</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="layout layout--admin">
+    <aside class="sidebar">
+        <div class="sidebar__brand">
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">JobPortal Admin</a>
+        </div>
+        <nav class="sidebar__nav">
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="sidebar__link">Dashboard</a>
+            <a asp-area="Admin" asp-controller="Jobs" asp-action="Index" class="sidebar__link">Jobs</a>
+            <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="sidebar__link">Users</a>
+            <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="sidebar__link">Applications</a>
+            <a asp-area="Admin" asp-controller="Messages" asp-action="Index" class="sidebar__link">Messages</a>
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="sidebar__link">Public site</a>
+        </nav>
+        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="sidebar__logout">
+            <button type="submit" class="btn btn-outline">Sign out</button>
+        </form>
+    </aside>
+    <main class="main">
+        <header class="topbar">
+            <div class="topbar__title">
+                <h1>@title</h1>
+            </div>
+        </header>
+        <div class="content">
+            @RenderBody()
+        </div>
+    </main>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

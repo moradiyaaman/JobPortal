@@ -1,0 +1,90 @@
+@model JobPortal.Models.Job
+@{
+    ViewData["Title"] = "Edit job";
+}
+<section class="page-header">
+    <div>
+        <h1>Edit job</h1>
+        <p class="text-muted">Update job details and manage visibility.</p>
+    </div>
+</section>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="card card--padded form-grid">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CompanyName"></label>
+        <input asp-for="CompanyName" class="form-control" />
+        <span asp-validation-for="CompanyName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CompanyWebsite"></label>
+        <input asp-for="CompanyWebsite" class="form-control" />
+        <span asp-validation-for="CompanyWebsite" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Company logo</label>
+        <input type="file" name="companyLogo" class="form-control-file" />
+        @if (!string.IsNullOrEmpty(Model.CompanyLogoPath))
+        {
+            <p class="text-muted mt-2">Current logo: <img src="@Model.CompanyLogoPath" alt="Logo" class="logo-preview" /></p>
+        }
+    </div>
+    <div class="form-group">
+        <label asp-for="Location"></label>
+        <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Country"></label>
+        <input asp-for="Country" class="form-control" />
+        <span asp-validation-for="Country" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="JobType"></label>
+        <input asp-for="JobType" class="form-control" />
+        <span asp-validation-for="JobType" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Salary"></label>
+        <input asp-for="Salary" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Qualifications"></label>
+        <textarea asp-for="Qualifications" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+        <label asp-for="Experience"></label>
+        <textarea asp-for="Experience" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+        <label asp-for="Skills"></label>
+        <textarea asp-for="Skills" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+        <label class="checkbox">
+            <input asp-for="IsActive" />
+            <span>Visible to job seekers</span>
+        </label>
+    </div>
+
+    <div class="form-group form-group--actions">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a asp-action="Index" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

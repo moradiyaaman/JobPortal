@@ -1,0 +1,109 @@
+@model JobPortal.Models.Job
+@{
+    ViewData["Title"] = "Job details";
+}
+<section class="admin-job-detail">
+    <a asp-area="Admin" asp-controller="Jobs" asp-action="Index" class="btn btn-link mb-3">← Back to jobs</a>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="h4">@Model.Title</h1>
+                    <p class="text-muted mb-2">@Model.CompanyName · @Model.Location</p>
+                    <div class="mb-3">
+                        <span class="badge badge-secondary mr-2">@Model.JobType</span>
+                        <span class="text-muted">Posted @Model.PostedAt.ToLocalTime():f</span>
+                    </div>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoPath))
+                {
+                    <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName logo" style="max-height:80px;" />
+                }
+            </div>
+            <p>@Html.Raw(Model.Description?.Replace("\n", "<br />"))</p>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="h6 text-uppercase text-muted">Requirements</h2>
+                    @if (!string.IsNullOrWhiteSpace(Model.Qualifications))
+                    {
+                        <p>@Html.Raw(Model.Qualifications?.Replace("\n", "<br />"))</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.Experience))
+                    {
+                        <p>@Html.Raw(Model.Experience?.Replace("\n", "<br />"))</p>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.Skills))
+                    {
+                        <p>@Html.Raw(Model.Skills?.Replace("\n", "<br />"))</p>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h2 class="h6 text-uppercase text-muted">Listing info</h2>
+                    <ul class="list-unstyled">
+                        <li><strong>Status:</strong> @(Model.IsActive ? "Active" : "Hidden")</li>
+                        <li><strong>Salary:</strong> @Model.Salary</li>
+                        <li><strong>Country:</strong> @Model.Country</li>
+                        @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
+                        {
+                            <li><strong>Website:</strong> <a href="@Model.CompanyWebsite" target="_blank" rel="noopener">@Model.CompanyWebsite</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            @if (Model.Provider != null)
+            {
+                <hr />
+                <h2 class="h5">Provider</h2>
+                <p><strong>@(Model.Provider.CompanyName ?? Model.Provider.FullName)</strong></p>
+                @if (!string.IsNullOrWhiteSpace(Model.Provider.CompanyDescription))
+                {
+                    <p class="text-muted">@Model.Provider.CompanyDescription</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Provider.CompanyWebsite))
+                {
+                    <p class="small"><a href="@Model.Provider.CompanyWebsite" target="_blank" rel="noopener">@Model.Provider.CompanyWebsite</a></p>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h2 class="h6 mb-0">Applications (@Model.Applications?.Count ?? 0)</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Applicant</th>
+                        <th>Email</th>
+                        <th>Applied</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Applications?.Any() == true)
+                    {
+                        foreach (var app in Model.Applications.OrderByDescending(a => a.AppliedAt))
+                        {
+                            <tr>
+                                <td>@(app.Applicant?.FullName ?? app.Applicant?.UserName)</td>
+                                <td>@app.Applicant?.Email</td>
+                                <td>@app.AppliedAt.ToLocalTime():g</td>
+                                <td>@app.Status</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No applications yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,96 @@
+@model IEnumerable<AdminUserListItemViewModel>
+@{
+    ViewData["Title"] = "Manage users";
+}
+<section class="admin-users">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Users</h1>
+            <p class="text-muted mb-0">Promote administrators or moderate member accounts.</p>
+        </div>
+        <a asp-area="Admin" asp-controller="Users" asp-action="CreateAdmin" class="btn btn-primary">Add admin</a>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info">@TempData["Info"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Joined</th>
+                        <th>Jobs</th>
+                        <th>Applications</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        foreach (var user in Model)
+                        {
+                            <tr class="@(user.IsLockedOut ? "table-warning" : string.Empty)">
+                                <td>
+                                    <strong>@user.UserName</strong><br />
+                                    <span class="text-muted">@user.FullName</span>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>
+                                    @if (user.IsAdmin)
+                                    {
+                                        <span class="badge badge-primary mr-1">Admin</span>
+                                    }
+                                    @if (user.IsProvider)
+                                    {
+                                        <span class="badge badge-info">Provider</span>
+                                    }
+                                </td>
+                                <td>@user.CreatedAt.ToLocalTime():d</td>
+                                <td>@user.JobsPosted</td>
+                                <td>@user.ApplicationsSubmitted</td>
+                                <td class="text-right">
+                                    <a asp-area="Admin" asp-controller="Users" asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                                    @if (!user.IsAdmin)
+                                    {
+                                        <form asp-area="Admin" asp-controller="Users" asp-action="PromoteToAdmin" asp-route-id="@user.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Promote</button>
+                                        </form>
+                                    }
+                                    <form asp-area="Admin" asp-controller="Users" asp-action="ToggleLockout" asp-route-id="@user.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm @(user.IsLockedOut ? "btn-outline-success" : "btn-outline-warning")">@(user.IsLockedOut ? "Enable" : "Disable")</button>
+                                    </form>
+                                    <form asp-area="Admin" asp-controller="Users" asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this user? This will remove their jobs and applications.');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">No users found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

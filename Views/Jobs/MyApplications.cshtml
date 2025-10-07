@@ -1,0 +1,35 @@
+@model IEnumerable<MyApplicationViewModel>
+@{
+    ViewData["Title"] = "My applications";
+}
+<section class="page-header">
+    <div>
+        <h1>Your applications</h1>
+        <p class="text-muted">Track every role you've applied for in one place.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline">Browse jobs</a>
+</section>
+
+@if (!(Model?.Any() ?? false))
+{
+    <div class="empty-state">
+        <h3>No applications yet</h3>
+        <p class="text-muted">Start exploring jobs and apply to the ones you love.</p>
+    </div>
+}
+else
+{
+    <div class="timeline">
+        @foreach (var application in Model)
+        {
+            <article class="timeline__item">
+                <div class="timeline__date">@application.AppliedAt.ToString("MMM d, yyyy")</div>
+                <div class="timeline__content">
+                    <h2><a asp-action="Details" asp-route-id="@application.JobId">@application.JobTitle</a></h2>
+                    <p class="text-muted">@application.CompanyName · @application.Location</p>
+                    <span class="status-pill">@application.Status</span>
+                </div>
+            </article>
+        }
+    </div>
+}

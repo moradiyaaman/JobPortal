@@ -1,0 +1,54 @@
+@model JobPortal.Models.Job
+@{
+    ViewData["Title"] = "Applications";
+}
+<section class="page-header">
+    <div>
+        <h1>@Model.Title</h1>
+        <p class="text-muted">@Model.CompanyName · @Model.Location</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline">Back to jobs</a>
+</section>
+
+@if (!(Model.Applications?.Any() ?? false))
+{
+    <div class="empty-state">
+        <h3>No applicants yet</h3>
+        <p class="text-muted">Share this listing to attract more candidates.</p>
+    </div>
+}
+else
+{
+    <table class="table table--responsive">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Email</th>
+                <th>Applied</th>
+                <th>Status</th>
+                <th>Resume</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var application in Model.Applications.OrderByDescending(a => a.AppliedAt))
+        {
+            <tr>
+                <td data-label="Applicant">@application.Applicant.FullName</td>
+                <td data-label="Email">@application.Applicant.Email</td>
+                <td data-label="Applied">@application.AppliedAt.ToString("MMM d, yyyy")</td>
+                <td data-label="Status"><span class="status-pill">@application.Status</span></td>
+                <td data-label="Resume">
+                    @if (!string.IsNullOrEmpty(application.Applicant.ResumeFileName))
+                    {
+                        <a href="@application.Applicant.ResumeFileName" target="_blank" class="btn btn-secondary">Download</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not uploaded</span>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,114 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Create account";
+}
+<section class="auth-card">
+    <div class="auth-card__header">
+        <h1>Create your account</h1>
+        <p class="text-muted">Join to track jobs, manage applications, and connect with employers.</p>
+    </div>
+    <form asp-action="Register" method="post" class="form-grid" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="form-group">
+            <label asp-for="AccountType"></label>
+            <select asp-for="AccountType" class="form-control">
+                <option value="Seeker">Job seeker</option>
+                <option value="Provider">Provider / Employer</option>
+            </select>
+            <span asp-validation-for="AccountType" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="UserName"></label>
+            <input asp-for="UserName" class="form-control" autocomplete="username" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="FullName"></label>
+            <input asp-for="FullName" class="form-control" autocomplete="name" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" autocomplete="email" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Mobile"></label>
+            <input asp-for="Mobile" class="form-control" autocomplete="tel" />
+            <span asp-validation-for="Mobile" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Country"></label>
+            <input asp-for="Country" class="form-control" />
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Address"></label>
+            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="form-control" autocomplete="new-password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="provider-fields" data-provider-fields>
+            <h2 class="h5 mt-4">Company details</h2>
+            <p class="text-muted">These fields are required for provider accounts.</p>
+
+            <div class="form-group">
+                <label asp-for="CompanyName"></label>
+                <input asp-for="CompanyName" class="form-control" />
+                <span asp-validation-for="CompanyName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyWebsite"></label>
+                <input asp-for="CompanyWebsite" class="form-control" />
+                <span asp-validation-for="CompanyWebsite" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyLocation"></label>
+                <input asp-for="CompanyLocation" class="form-control" />
+                <span asp-validation-for="CompanyLocation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyDescription"></label>
+                <textarea asp-for="CompanyDescription" rows="3" class="form-control"></textarea>
+                <span asp-validation-for="CompanyDescription" class="text-danger"></span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        <p class="text-center text-muted mt-3">
+            Already have an account? <a asp-action="Login">Sign in</a>
+        </p>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const accountTypeSelect = document.querySelector('[name="AccountType"]');
+            const providerSection = document.querySelector('[data-provider-fields]');
+
+            function toggleProviderFields() {
+                const isProvider = accountTypeSelect.value === 'Provider';
+                providerSection.style.display = isProvider ? '' : 'none';
+            }
+
+            if (accountTypeSelect && providerSection) {
+                accountTypeSelect.addEventListener('change', toggleProviderFields);
+                toggleProviderFields();
+            }
+        })();
+    </script>
+}

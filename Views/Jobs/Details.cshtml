@@ -1,0 +1,113 @@
+@model JobDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+<section class="page-header">
+    <div>
+        <p class="text-muted">@Model.CompanyName · @Model.Location</p>
+        <h1>@Model.Title</h1>
+        <div class="job-detail__meta">
+            <span class="badge">@Model.JobType</span>
+            <span class="text-muted">Posted @Model.PostedAt.ToString("MMMM d, yyyy")</span>
+        </div>
+    </div>
+    <div class="job-detail__actions">
+        @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoPath))
+        {
+            <img src="@Model.CompanyLogoPath" alt="@Model.CompanyName logo" class="company-logo" />
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Info"] != null)
+        {
+            <div class="alert alert-info">@TempData["Info"]</div>
+        }
+
+        @if (Model.IsApplied)
+        {
+            <button class="btn btn-disabled" disabled>Applied</button>
+        }
+        else if (!Model.CanApply)
+        {
+            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", new { id = Model.Id })" class="btn btn-primary">Sign in to apply</a>
+        }
+        else
+        {
+            <form asp-action="Apply" method="post" class="inline-form">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">Apply now</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section class="card card--padded job-detail__body">
+    <div class="job-detail__content">
+        <h2>About the role</h2>
+        <p>@Html.Raw(Model.Description?.Replace("\n", "<br />"))</p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Qualifications))
+        {
+            <h3>Qualifications</h3>
+            <p>@Html.Raw(Model.Qualifications?.Replace("\n", "<br />"))</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Experience))
+        {
+            <h3>Experience</h3>
+            <p>@Html.Raw(Model.Experience?.Replace("\n", "<br />"))</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Skills))
+        {
+            <h3>Core skills</h3>
+            <p>@Html.Raw(Model.Skills?.Replace("\n", "<br />"))</p>
+        }
+    </div>
+    <aside class="job-detail__sidebar">
+        <div class="info-card">
+            <h4>At a glance</h4>
+            <ul>
+                @if (!string.IsNullOrEmpty(Model.Salary))
+                {
+                    <li><strong>Salary</strong><span>@Model.Salary</span></li>
+                }
+                <li><strong>Location</strong><span>@Model.Location, @Model.Country</span></li>
+                <li><strong>Job type</strong><span>@Model.JobType</span></li>
+            </ul>
+        </div>
+        <div class="info-card">
+            <h4>Company</h4>
+            <ul>
+                <li><strong>Name</strong><span>@Model.CompanyName</span></li>
+                @if (!string.IsNullOrEmpty(Model.CompanyWebsite))
+                {
+                    <li><strong>Website</strong><span><a href="@Model.CompanyWebsite" target="_blank" rel="noopener">Visit site</a></span></li>
+                }
+            </ul>
+            @if (!string.IsNullOrWhiteSpace(Model.ProviderSummary))
+            {
+                <p class="small text-muted mt-2">@Model.ProviderSummary</p>
+            }
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.ProviderDisplayName) && Model.ProviderDisplayName != Model.CompanyName)
+        {
+            <div class="info-card">
+                <h4>Posted by</h4>
+                <p class="mb-1"><strong>@Model.ProviderDisplayName</strong></p>
+                @if (!string.IsNullOrWhiteSpace(Model.ProviderWebsite))
+                {
+                    <p class="small"><a href="@Model.ProviderWebsite" target="_blank" rel="noopener">Company profile</a></p>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.ProviderSummary))
+                {
+                    <p class="small text-muted">@Model.ProviderSummary</p>
+                }
+            </div>
+        }
+    </aside>
+</section>

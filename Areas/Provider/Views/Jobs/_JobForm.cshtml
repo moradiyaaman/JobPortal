@@ -1,0 +1,83 @@
+@model ProviderJobFormViewModel
+<div class="row">
+    <div class="col-lg-8">
+        <div class="form-group">
+            <label asp-for="Title"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Qualifications"></label>
+            <textarea asp-for="Qualifications" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Qualifications" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Experience"></label>
+            <textarea asp-for="Experience" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Experience" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Skills"></label>
+            <textarea asp-for="Skills" class="form-control" rows="2"></textarea>
+            <span asp-validation-for="Skills" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                <h2 class="h6 mb-0">Listing details</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label asp-for="JobType"></label>
+                    <input asp-for="JobType" class="form-control" />
+                    <span asp-validation-for="JobType" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Salary"></label>
+                    <input asp-for="Salary" class="form-control" />
+                    <span asp-validation-for="Salary" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Location"></label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Country"></label>
+                    <input asp-for="Country" class="form-control" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Active listing</label>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h2 class="h6 mb-0">Company snapshot</h2>
+            </div>
+            <div class="card-body">
+                <p><strong>@Model.ProviderCompanyName</strong></p>
+                @if (!string.IsNullOrWhiteSpace(Model.ProviderCompanyLocation))
+                {
+                    <p class="mb-1 text-muted">@Model.ProviderCompanyLocation</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.ProviderCompanyWebsite))
+                {
+                    <p class="mb-1"><a href="@Model.ProviderCompanyWebsite" target="_blank" rel="noopener">@Model.ProviderCompanyWebsite</a></p>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.ProviderCompanyDescription))
+                {
+                    <p class="small text-muted">@Model.ProviderCompanyDescription</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

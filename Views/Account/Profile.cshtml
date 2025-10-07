@@ -1,0 +1,132 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+}
+<section class="page-header">
+    <h1>Your profile</h1>
+    <p class="text-muted">Keep your resume and professional story up to date for faster applications.</p>
+</section>
+
+@if (ViewData["Success"] != null)
+{
+    <div class="alert alert-success">@ViewData["Success"]</div>
+}
+
+<form asp-action="Profile" method="post" enctype="multipart/form-data" class="card card--padded">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="grid grid--two">
+        <div class="form-group">
+            <label asp-for="FullName"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Headline"></label>
+            <input asp-for="Headline" class="form-control" />
+            <span asp-validation-for="Headline" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="grid grid--two">
+        <div class="form-group">
+            <label asp-for="Mobile"></label>
+            <input asp-for="Mobile" class="form-control" />
+            <span asp-validation-for="Mobile" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Country"></label>
+            <input asp-for="Country" class="form-control" />
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="grid grid--two">
+        <div class="form-group">
+            <label asp-for="Address"></label>
+            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Summary"></label>
+            <textarea asp-for="Summary" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Summary" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="grid grid--two">
+        <div class="form-group">
+            <label asp-for="Education"></label>
+            <textarea asp-for="Education" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Education" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Experience"></label>
+            <textarea asp-for="Experience" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Experience" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Skills"></label>
+        <textarea asp-for="Skills" class="form-control" rows="3" placeholder="Design, Python, Project management"></textarea>
+        <span asp-validation-for="Skills" class="text-danger"></span>
+    </div>
+
+    @if (Model.IsProvider)
+    {
+        <hr />
+        <h2 class="h5">Company profile</h2>
+        <p class="text-muted">These details appear on every job you post.</p>
+
+        <div class="grid grid--two">
+            <div class="form-group">
+                <label asp-for="CompanyName"></label>
+                <input asp-for="CompanyName" class="form-control" />
+                <span asp-validation-for="CompanyName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyWebsite"></label>
+                <input asp-for="CompanyWebsite" class="form-control" />
+                <span asp-validation-for="CompanyWebsite" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="grid grid--two">
+            <div class="form-group">
+                <label asp-for="CompanyLocation"></label>
+                <input asp-for="CompanyLocation" class="form-control" />
+                <span asp-validation-for="CompanyLocation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyLogoFile"></label>
+                <input asp-for="CompanyLogoFile" type="file" class="form-control-file" />
+                <span asp-validation-for="CompanyLogoFile" class="text-danger"></span>
+                @if (!string.IsNullOrEmpty(Model.ExistingCompanyLogoPath))
+                {
+                    <p class="text-muted mt-2">Current logo: <img src="@Model.ExistingCompanyLogoPath" alt="Company logo" style="max-height:60px" /></p>
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="CompanyDescription"></label>
+            <textarea asp-for="CompanyDescription" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="CompanyDescription" class="text-danger"></span>
+        </div>
+    }
+
+    <div class="form-group">
+        <label asp-for="ResumeFile"></label>
+        <input asp-for="ResumeFile" type="file" class="form-control-file" />
+        <span asp-validation-for="ResumeFile" class="text-danger"></span>
+        @if (!string.IsNullOrEmpty(Model.ExistingResumeFileName))
+        {
+            <p class="text-muted mt-2">Current file: <a href="@Model.ExistingResumeFileName" target="_blank">Download resume</a></p>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save changes</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

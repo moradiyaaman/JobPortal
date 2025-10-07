@@ -1,0 +1,101 @@
+@model JobFilterViewModel
+@{
+    ViewData["Title"] = "Find jobs";
+}
+<section class="page-header">
+    <div>
+        <h1>Discover opportunities</h1>
+        <p class="text-muted">Search and filter open roles that match your skills and aspirations.</p>
+    </div>
+    <a asp-action="MyApplications" class="btn btn-outline">My applications</a>
+</section>
+
+<section class="card card--padded">
+    <form method="get" class="filters-grid">
+        <div class="form-group">
+            <label asp-for="Keyword"></label>
+            <input asp-for="Keyword" class="form-control" placeholder="Design lead, Remote..." />
+        </div>
+        <div class="form-group">
+            <label asp-for="Country"></label>
+            <select asp-for="Country" class="form-control">
+                <option value="">Any</option>
+                @foreach (var country in Model.AvailableCountries ?? Enumerable.Empty<string>())
+                {
+                    <option value="@country">@country</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="JobType"></label>
+            <select asp-for="JobType" class="form-control">
+                <option value="">Any</option>
+                @foreach (var jobType in Model.AvailableJobTypes ?? Enumerable.Empty<string>())
+                {
+                    <option value="@jobType">@jobType</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="PostedWithinDays"></label>
+            <select asp-for="PostedWithinDays" class="form-control">
+                <option value="">Any time</option>
+                <option value="2">Last 2 days</option>
+                <option value="7">Last 7 days</option>
+                <option value="14">Last 14 days</option>
+                <option value="30">Last 30 days</option>
+            </select>
+        </div>
+        <div class="form-group form-group--actions">
+            <button type="submit" class="btn btn-primary">Apply filters</button>
+            <a asp-action="Index" class="btn btn-link">Reset</a>
+        </div>
+    </form>
+</section>
+
+@if (!(Model.Jobs?.Any() ?? false))
+{
+    <div class="empty-state">
+        <h3>No jobs found</h3>
+        <p class="text-muted">Try adjusting your filters or check back later for new roles.</p>
+    </div>
+}
+else
+{
+    <div class="job-grid">
+        @foreach (var job in Model.Jobs)
+        {
+            <article class="job-card @(job.IsApplied ? "job-card--applied" : string.Empty)">
+                @if (!string.IsNullOrWhiteSpace(job.CompanyLogoPath))
+                {
+                    <img src="@job.CompanyLogoPath" alt="@job.CompanyName logo" class="company-logo" />
+                }
+                <div class="job-card__meta">
+                    <span class="badge">@job.JobType</span>
+                    <span class="text-muted">Posted @job.PostedAt.ToString("MMM d")</span>
+                </div>
+                <h2><a asp-action="Details" asp-route-id="@job.Id">@job.Title</a></h2>
+                <p class="text-muted">@job.CompanyName · @job.Location</p>
+                @if (!string.IsNullOrWhiteSpace(job.ProviderSummary))
+                {
+                    <p class="job-card__summary text-muted">@job.ProviderSummary</p>
+                }
+                @if (!string.IsNullOrEmpty(job.Salary))
+                {
+                    <p class="job-card__salary">@job.Salary</p>
+                }
+                <div class="job-card__footer">
+                    <a asp-action="Details" asp-route-id="@job.Id" class="btn btn-secondary">View details</a>
+                    @if (job.IsApplied)
+                    {
+                        <span class="status-pill">Applied</span>
+                    }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(job.CompanyWebsite))
+                {
+                    <p class="small"><a href="@job.CompanyWebsite" target="_blank" rel="noopener">Visit company site</a></p>
+                }
+            </article>
+        }
+    </div>
+}

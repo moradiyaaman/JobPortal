@@ -1,0 +1,95 @@
+﻿@model HomeStatsViewModel
+@{
+    ViewData["Title"] = "Online Job Portal";
+}
+
+<section class="hero">
+    <div class="hero__content">
+        <span class="badge badge--soft">Launch your next chapter</span>
+        <h1>Find the job that fits your life</h1>
+        <p class="lead">Explore curated opportunities, keep your profile polished, and apply in one click. Everything you need for a smarter job search.</p>
+        <div class="hero__actions">
+            <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary">Browse jobs</a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline">Create free account</a>
+        </div>
+    </div>
+    <div class="hero__stats">
+        <div class="hero-stat">
+            <span>@Model.TotalJobs</span>
+            <small>Active roles</small>
+        </div>
+        <div class="hero-stat">
+            <span>@Model.TotalApplications</span>
+            <small>Applications submitted</small>
+        </div>
+        <div class="hero-stat">
+            <span>@Model.TotalUsers</span>
+            <small>Talented professionals</small>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="highlight">
+        <div class="highlight__item">
+            <h3>Personalized profile</h3>
+            <p>Showcase your experience, education, and skills. Upload a resume that recruiters can download instantly.</p>
+        </div>
+        <div class="highlight__item">
+            <h3>Smart filters</h3>
+            <p>Zero in on the roles that matter using location, job type, and recency filters.</p>
+        </div>
+        <div class="highlight__item">
+            <h3>Admin oversight</h3>
+            <p>Employers manage listings, track applicants, and respond to inquiries in a unified dashboard.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section__header">
+        <h2>Latest opportunities</h2>
+        <a asp-controller="Jobs" asp-action="Index" class="link">View all jobs</a>
+    </div>
+
+    @if (!(Model.RecentJobs?.Any() ?? false))
+    {
+        <div class="empty-state">
+            <h3>No listings yet</h3>
+            <p class="text-muted">Check back soon for new opportunities.</p>
+        </div>
+    }
+    else
+    {
+        <div class="job-grid">
+            @foreach (var job in Model.RecentJobs)
+            {
+                <article class="job-card">
+                    @if (!string.IsNullOrWhiteSpace(job.CompanyLogoPath))
+                    {
+                        <img src="@job.CompanyLogoPath" alt="@job.CompanyName logo" class="company-logo" />
+                    }
+                    <div class="job-card__meta">
+                        <span class="badge">@job.JobType</span>
+                        <span class="text-muted">Posted @job.PostedAt.ToString("MMM d")</span>
+                    </div>
+                    <h3><a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.Id">@job.Title</a></h3>
+                    <p class="text-muted">@job.CompanyName · @job.Location</p>
+                    @if (!string.IsNullOrEmpty(job.Salary))
+                    {
+                        <p class="job-card__salary">@job.Salary</p>
+                    }
+                    <a asp-controller="Jobs" asp-action="Details" asp-route-id="@job.Id" class="btn btn-secondary">View details</a>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+<section class="cta">
+    <div class="cta__content">
+        <h2>Need support?</h2>
+        <p class="text-muted">Questions about posting a job or accessing your applications? We're here to help.</p>
+        <a asp-controller="Contact" asp-action="Index" class="btn btn-primary">Contact support</a>
+    </div>
+</section>
