@@ -11,7 +11,7 @@
                 <p class="text-sm text-slate-500">@Model.CompanyName · @Model.Location</p>
                 <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
                     <span class="pill bg-primary-50 text-primary-600">@Model.JobType</span>
-                    <span>Posted @Model.PostedAt.ToLocalTime():f</span>
+                    <span>Posted @Model.PostedAt.ToLocalTime().ToString("f")</span>
                 </div>
             </div>
             @if (!string.IsNullOrWhiteSpace(Model.CompanyLogoPath))

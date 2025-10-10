@@ -9,10 +9,13 @@ using JobPortal.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace JobPortal
 {
@@ -49,6 +52,13 @@ namespace JobPortal
                 options.AccessDeniedPath = "/Account/AccessDenied";
             });
 
+            // Increase multipart/form-data upload limit (IIS/Kestrel agnostic)
+            services.Configure<FormOptions>(o =>
+            {
+                // 100 MB default limit for resume/logo uploads
+                o.MultipartBodyLengthLimit = 100 * 1024 * 1024;
+            });
+
             services.AddControllersWithViews();
 
             services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
@@ -59,6 +69,33 @@ namespace JobPortal
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Ensure the target DB for the active profile is migrated at app start
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Startup>>();
+                db.Database.Migrate();
+
+                try
+                {
+                    var conn = db.Database.GetDbConnection();
+                    var builder = new SqlConnectionStringBuilder(conn.ConnectionString);
+                    var applied = db.Database.GetAppliedMigrations().ToList();
+                    logger.LogInformation("Connected to SQL Server {Server} / DB {Database}. Applied migrations: {Count}. Last: {Last}", builder.DataSource, builder.InitialCatalog, applied.Count, applied.LastOrDefault());
+                }
+                catch (Exception ex)
+                {
+                    // Best-effort diagnostics
+                    var applied = db.Database.GetAppliedMigrations().ToList();
+                    var last = applied.LastOrDefault();
+                    var count = applied.Count;
+                    var msg = $"Applied migrations: {count}. Last: {last}";
+                    var cs = db.Database.GetDbConnection()?.ConnectionString ?? "<unknown>";
+                    var redacted = cs;
+                    logger.LogWarning(ex, "Startup DB diagnostics failed. {Msg}. ConnString: {Conn}", msg, redacted);
+                }
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
