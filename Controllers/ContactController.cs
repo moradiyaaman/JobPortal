@@ -21,7 +21,10 @@ namespace JobPortal.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View(new ContactMessage());
+            return View(new ContactMessage
+            {
+                PreferredContactDate = System.DateTime.UtcNow.Date
+            });
         }
 
         [HttpPost]
@@ -38,7 +41,10 @@ namespace JobPortal.Controllers
             await _context.SaveChangesAsync();
             ViewData["Success"] = "Thanks! Your message has been sent.";
             ModelState.Clear();
-            return View(new ContactMessage());
+            return View(new ContactMessage
+            {
+                PreferredContactDate = System.DateTime.UtcNow.Date
+            });
         }
     }
 }

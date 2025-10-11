@@ -35,6 +35,11 @@
         <textarea asp-for="Message" rows="5" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
         <span asp-validation-for="Message" class="text-sm text-red-500"></span>
     </div>
+    <div class="input-group">
+        <label asp-for="PreferredContactDate" class="text-sm font-medium text-slate-600"></label>
+        <input asp-for="PreferredContactDate" type="date" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+        <span asp-validation-for="PreferredContactDate" class="text-sm text-red-500"></span>
+    </div>
 
     <button type="submit" class="btn btn-primary w-full sm:w-auto">Send message</button>
 </form>

@@ -15,13 +15,16 @@ namespace JobPortal.Models
         [EmailAddress]
         public string Email { get; set; }
 
-    [Required]
+        [Required]
         [MaxLength(160)]
         public string Subject { get; set; }
 
         [Required]
         [MaxLength(1500)]
         public string Message { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? PreferredContactDate { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
