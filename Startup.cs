@@ -64,6 +64,9 @@ namespace JobPortal
             services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
             services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddHostedService<JobAlertDispatcher>();
+
+            // ATS scorer
+            services.AddTransient<IAtsScorer, SimpleAtsScorer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

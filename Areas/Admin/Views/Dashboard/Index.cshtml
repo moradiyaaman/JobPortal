@@ -3,41 +3,41 @@
     ViewData["Title"] = "Dashboard";
 }
 <section class="space-y-3">
-    <h1 class="text-3xl font-semibold text-slate-900">Admin dashboard</h1>
-    <p class="text-sm text-slate-500">Monitor platform activity and respond to applicants faster.</p>
+    <h1 class="text-3xl font-semibold text-content-light">Admin dashboard</h1>
+    <p class="text-sm text-subtle-light">Monitor platform activity and respond to applicants faster.</p>
 </section>
 
 <div class="grid gap-5 pt-6 md:grid-cols-2 xl:grid-cols-4">
     <div class="card space-y-2 p-6">
-        <p class="text-xs uppercase tracking-wide text-slate-400">Total jobs</p>
-        <p class="text-3xl font-semibold text-slate-900">@Model.TotalJobs</p>
+        <p class="text-xs uppercase tracking-wide text-subtle-light">Total jobs</p>
+        <p class="text-3xl font-semibold text-content-light">@Model.TotalJobs</p>
     </div>
     <div class="card space-y-2 p-6">
-        <p class="text-xs uppercase tracking-wide text-slate-400">Active jobs</p>
-        <p class="text-3xl font-semibold text-slate-900">@Model.ActiveJobs</p>
+        <p class="text-xs uppercase tracking-wide text-subtle-light">Active jobs</p>
+        <p class="text-3xl font-semibold text-content-light">@Model.ActiveJobs</p>
     </div>
     <div class="card space-y-2 p-6">
-        <p class="text-xs uppercase tracking-wide text-slate-400">Applications</p>
-        <p class="text-3xl font-semibold text-slate-900">@Model.TotalApplications</p>
+        <p class="text-xs uppercase tracking-wide text-subtle-light">Applications</p>
+        <p class="text-3xl font-semibold text-content-light">@Model.TotalApplications</p>
     </div>
     <div class="card space-y-2 p-6">
-        <p class="text-xs uppercase tracking-wide text-slate-400">Job seekers</p>
-        <p class="text-3xl font-semibold text-slate-900">@Model.TotalUsers</p>
+        <p class="text-xs uppercase tracking-wide text-subtle-light">Job seekers</p>
+        <p class="text-3xl font-semibold text-content-light">@Model.TotalUsers</p>
     </div>
     <div class="card space-y-2 p-6 md:col-span-2 xl:col-span-4">
-        <p class="text-xs uppercase tracking-wide text-slate-400">Contact messages</p>
-        <p class="text-3xl font-semibold text-slate-900">@Model.ContactMessagesCount</p>
+        <p class="text-xs uppercase tracking-wide text-subtle-light">Contact messages</p>
+        <p class="text-3xl font-semibold text-content-light">@Model.ContactMessagesCount</p>
     </div>
 </div>
 
 <section class="card mt-8 overflow-hidden">
     <div class="flex flex-col gap-3 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-        <h2 class="text-lg font-semibold text-slate-900">Recent applications</h2>
+        <h2 class="text-lg font-semibold text-content-light">Recent applications</h2>
         <a asp-area="Admin" asp-controller="Applications" asp-action="Index" class="btn btn-secondary">View all</a>
     </div>
     @if (!(Model.RecentApplications?.Any() ?? false))
     {
-        <div class="px-6 py-12 text-center text-sm text-slate-500">No applications yet.</div>
+        <div class="px-6 py-12 text-center text-sm text-subtle-light">No applications yet.</div>
     }
     else
     {
@@ -45,19 +45,19 @@
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-6 py-3 font-medium text-slate-500">Job</th>
-                        <th class="px-6 py-3 font-medium text-slate-500">Applicant</th>
-                        <th class="px-6 py-3 font-medium text-slate-500">Applied</th>
-                        <th class="px-6 py-3 font-medium text-slate-500">Status</th>
+                        <th class="px-6 py-3 font-medium text-subtle-light">Job</th>
+                        <th class="px-6 py-3 font-medium text-subtle-light">Applicant</th>
+                        <th class="px-6 py-3 font-medium text-subtle-light">Applied</th>
+                        <th class="px-6 py-3 font-medium text-subtle-light">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-slate-100 text-subtle-light">
                     @foreach (var application in Model.RecentApplications)
                     {
                         <tr class="hover:bg-slate-50/60">
-                            <td class="px-6 py-4 text-slate-700">@application.JobTitle</td>
-                            <td class="px-6 py-4 text-slate-500">@application.ApplicantName</td>
-                            <td class="px-6 py-4 text-slate-500">@application.AppliedAt.ToString("MMM d, yyyy")</td>
+                            <td class="px-6 py-4 text-content-light">@application.JobTitle</td>
+                            <td class="px-6 py-4">@application.ApplicantName</td>
+                            <td class="px-6 py-4">@application.AppliedAt.ToString("MMM d, yyyy")</td>
                             <td class="px-6 py-4"><span class="pill bg-primary-50 text-primary-600">@application.Status</span></td>
                         </tr>
                     }

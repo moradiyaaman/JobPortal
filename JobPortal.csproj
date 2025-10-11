@@ -19,6 +19,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- Keep DOCX parsing only; PDF will use naive read to ensure stability -->
+    <PackageReference Include="DocumentFormat.OpenXml" Version="2.13.1" />
+    <PackageReference Include="itext7" Version="7.2.5" />
   </ItemGroup>
 
 </Project>

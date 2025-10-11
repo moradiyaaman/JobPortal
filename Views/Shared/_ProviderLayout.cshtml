@@ -1,0 +1,154 @@
+@{
+    Layout = null;
+    var title = ViewData["Title"] as string ?? "Provider";
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString();
+    var actionName = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title · Provider · JobPortal</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#1173d4",
+                            50: "#e8f2fd",
+                            100: "#d3e6fb",
+                            500: "#1173d4",
+                            600: "#0f66bf",
+                            700: "#0c57a5"
+                        },
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1f2937",
+                        "content-light": "#1f2937",
+                        "content-dark": "#d1d5db",
+                        "subtle-light": "#6b7280",
+                        "subtle-dark": "#9ca3af",
+                        "border-light": "#e5e7eb",
+                        "border-dark": "#374151"
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                        display: ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        lg: "0.75rem",
+                        xl: "1rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <style type="text/tailwindcss">
+        @@layer base {
+            body {
+                @@apply bg-background-light text-content-light antialiased;
+            }
+        }
+
+        @@layer components {
+            .btn {
+                @@apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50;
+            }
+
+            .btn-primary {
+                @@apply bg-primary text-white shadow-sm hover:bg-primary/90;
+            }
+
+            .btn-secondary {
+                @@apply border border-border-light bg-white text-content-light hover:bg-background-light;
+            }
+
+            .btn-ghost {
+                @@apply text-subtle-light hover:text-content-light hover:bg-background-light;
+            }
+
+            .alert {
+                @@apply rounded-xl border px-4 py-3 text-sm;
+            }
+
+            .alert-success {
+                @@apply border-emerald-200 bg-emerald-50 text-emerald-700;
+            }
+
+            .alert-error {
+                @@apply border-red-200 bg-red-50 text-red-600;
+            }
+
+            .alert-info {
+                @@apply border-primary-100 bg-primary-50 text-primary-600;
+            }
+
+            .card {
+                @@apply rounded-2xl bg-white shadow-sm ring-1 ring-border-light;
+            }
+
+            .pill {
+                @@apply inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary;
+            }
+
+            .input-group {
+                @@apply flex flex-col gap-2;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="min-h-screen bg-background-light font-sans text-content-light">
+    <div class="flex min-h-screen flex-col">
+        <header class="sticky top-0 z-20 border-b border-border-light bg-surface-light/95 backdrop-blur">
+            <div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center gap-6">
+                    <a class="flex items-center gap-2 text-lg font-semibold" asp-area="Provider" asp-controller="Dashboard" asp-action="Index">
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">PF</span>
+                        <span>Provider hub</span>
+                    </a>
+                    <nav class="hidden items-center gap-4 md:flex">
+                        <a asp-area="Provider" asp-controller="Dashboard" asp-action="Index" class="text-sm font-medium transition @(controllerName == "Dashboard" ? "text-primary" : "text-subtle-light hover:text-primary")">Overview</a>
+                        <a asp-area="Provider" asp-controller="Jobs" asp-action="Index" class="text-sm font-medium transition @(controllerName == "Jobs" && actionName == "Index" ? "text-primary" : "text-subtle-light hover:text-primary")">Jobs</a>
+                        <a asp-area="Provider" asp-controller="Jobs" asp-action="Create" class="text-sm font-medium transition @(controllerName == "Jobs" && actionName == "Create" ? "text-primary" : "text-subtle-light hover:text-primary")">Post job</a>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-3 text-sm">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-secondary hidden sm:inline-flex">Public site</a>
+                    <span class="hidden text-subtle-light sm:inline">@User.Identity?.Name</span>
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="inline-flex">
+                        <button type="submit" class="btn btn-primary">Sign out</button>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1">
+            <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+                @RenderBody()
+            </div>
+        </main>
+
+        <footer class="border-t border-border-light bg-surface-light py-6 text-sm text-subtle-light">
+            <div class="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+                <p class="font-semibold text-content-light">JobPortal Provider</p>
+                <p class="text-subtle-light">Manage your openings and stay close to applicants.</p>
+                <a asp-area="" asp-controller="Contact" asp-action="Index" class="transition hover:text-primary">Contact support</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

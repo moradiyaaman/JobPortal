@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace JobPortal.Controllers
 {
@@ -289,6 +291,12 @@ namespace JobPortal.Controllers
                     return View(model);
                 }
 
+                if (!IsResumeContentSafe(model.ResumeFile))
+                {
+                    ModelState.AddModelError("ResumeFile", "The resume file content does not match the allowed types.");
+                    return View(model);
+                }
+
                 var webRoot = _environment.WebRootPath;
                 if (string.IsNullOrEmpty(webRoot))
                 {
@@ -369,6 +377,12 @@ namespace JobPortal.Controllers
                 if (model.CompanyLogoFile.Length > 2 * 1024 * 1024)
                 {
                     ModelState.AddModelError(nameof(model.CompanyLogoFile), "Logo file too large. Please upload an image up to 2 MB.");
+                    return View(model);
+                }
+
+                if (!IsCompanyLogoContentSafe(model.CompanyLogoFile))
+                {
+                    ModelState.AddModelError(nameof(model.CompanyLogoFile), "The logo file content does not match the allowed image types.");
                     return View(model);
                 }
 
@@ -476,18 +490,147 @@ namespace JobPortal.Controllers
         {
             if (!int.TryParse(_configuration["ResumeUpload:MaxFileSizeMb"], out int maxSizeMb))
             {
-                maxSizeMb = 5;
+                maxSizeMb = 10;
             }
 
             return file.Length <= maxSizeMb * 1024 * 1024;
         }
-
         private static readonly string[] AllowedLogoExtensions = new[] { ".png", ".jpg", ".jpeg", ".svg" };
 
         private bool IsCompanyLogoExtensionAllowed(IFormFile file)
         {
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
             return AllowedLogoExtensions.Contains(extension);
+        }
+
+        private static readonly byte[] PdfSignatureBytes = new byte[] { 0x25, 0x50, 0x44, 0x46 }; // %PDF
+        private static readonly byte[] DocSignatureBytes = new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 };
+        private static readonly byte[] DocxSignatureBytes = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
+        private static readonly byte[] PngSignatureBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        private static readonly byte[] JpegSignatureBytes = new byte[] { 0xFF, 0xD8, 0xFF };
+
+        private static readonly Dictionary<string, string[]> ResumeAllowedMimeTypes = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            [".pdf"] = new[] { "application/pdf" },
+            [".doc"] = new[] { "application/msword", "application/vnd.ms-word" },
+            [".docx"] = new[] { "application/vnd.openxmlformats-officedocument.wordprocessingml.document" }
+        };
+
+        private static readonly Dictionary<string, string[]> LogoAllowedMimeTypes = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            [".png"] = new[] { "image/png" },
+            [".jpg"] = new[] { "image/jpeg" },
+            [".jpeg"] = new[] { "image/jpeg" },
+            [".svg"] = new[] { "image/svg+xml" }
+        };
+
+        private bool IsResumeContentSafe(IFormFile file)
+        {
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!ResumeAllowedMimeTypes.TryGetValue(extension, out var allowedTypes))
+            {
+                return false;
+            }
+
+            if (!IsContentTypeExpected(file.ContentType, allowedTypes))
+            {
+                return false;
+            }
+
+            using var stream = file.OpenReadStream();
+            return extension switch
+            {
+                ".pdf" => MatchesSignature(stream, PdfSignatureBytes),
+                ".doc" => MatchesSignature(stream, DocSignatureBytes),
+                ".docx" => MatchesSignature(stream, DocxSignatureBytes),
+                _ => false
+            };
+        }
+
+        private bool IsCompanyLogoContentSafe(IFormFile file)
+        {
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!LogoAllowedMimeTypes.TryGetValue(extension, out var allowedTypes))
+            {
+                return false;
+            }
+
+            if (!IsContentTypeExpected(file.ContentType, allowedTypes))
+            {
+                return false;
+            }
+
+            using var stream = file.OpenReadStream();
+            return extension switch
+            {
+                ".png" => MatchesSignature(stream, PngSignatureBytes),
+                ".jpg" => MatchesSignature(stream, JpegSignatureBytes),
+                ".jpeg" => MatchesSignature(stream, JpegSignatureBytes),
+                ".svg" => IsSafeSvg(stream),
+                _ => false
+            };
+        }
+
+        private static bool MatchesSignature(Stream stream, params byte[][] signatures)
+        {
+            var nonNull = signatures?.Where(s => s != null && s.Length > 0).ToList();
+            if (nonNull == null || nonNull.Count == 0)
+            {
+                return false;
+            }
+
+            var maxLength = nonNull.Max(s => s.Length);
+            var buffer = new byte[maxLength];
+            var read = stream.Read(buffer, 0, maxLength);
+            stream.Position = 0;
+
+            foreach (var signature in nonNull)
+            {
+                if (read >= signature.Length && buffer.AsSpan(0, signature.Length).SequenceEqual(signature))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool MatchesSignature(Stream stream, byte[] signature)
+        {
+            return MatchesSignature(stream, new[] { signature });
+        }
+
+        private static bool IsContentTypeExpected(string contentType, IReadOnlyCollection<string> allowed)
+        {
+            if (string.IsNullOrWhiteSpace(contentType))
+            {
+                return true;
+            }
+
+            if (string.Equals(contentType, "application/octet-stream", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return allowed.Any(t => string.Equals(t, contentType, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool IsSafeSvg(Stream stream)
+        {
+            using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 4096, leaveOpen: false);
+            var content = reader.ReadToEnd();
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return false;
+            }
+
+            var trimmed = content.TrimStart();
+            if (!trimmed.StartsWith("<svg", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return content.IndexOf("<script", StringComparison.OrdinalIgnoreCase) < 0;
         }
     }
 }

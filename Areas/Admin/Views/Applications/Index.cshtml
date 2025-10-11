@@ -1,69 +1,108 @@
-@model IEnumerable<JobPortal.Models.JobApplication>
+@using System.Linq
+@model JobPortal.ViewModels.AdminApplicationsIndexViewModel
 @{
     ViewData["Title"] = "Applications";
     var statusOptions = ViewBag.StatusOptions as string[] ?? Array.Empty<string>();
+    var sortOrder = string.Equals(Model.SortOrder, "rank", StringComparison.OrdinalIgnoreCase) ? "rank" : "date";
+    var rankedByAts = sortOrder == "rank";
 }
-<section class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+<section class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
-        <h1 class="text-3xl font-semibold text-slate-900">All applications</h1>
-        <p class="text-sm text-slate-500">Monitor submissions across every listing and keep candidates in the loop.</p>
+        <h1 class="text-3xl font-semibold text-content-light">All applications</h1>
+        <p class="text-sm text-subtle-light">Monitor submissions across every listing and keep candidates in the loop.</p>
+        <p class="mt-1 text-xs text-subtle-light">
+            @if (rankedByAts)
+            {
+                <text>Sorted by ATS relevance. Switch to view newest submissions.</text>
+            }
+            else
+            {
+                <text>Sorted by applied date. Switch to view ATS ranking.</text>
+            }
+        </p>
+    </div>
+    <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 rounded-full border border-border-light bg-white px-2 py-1 text-xs font-medium text-subtle-light shadow-sm">
+                <span class="uppercase tracking-wide text-subtle-light opacity-80">Sort</span>
+                <a asp-action="Index" asp-route-sort="rank" class="rounded-full px-3 py-1 @(rankedByAts ? "bg-primary text-white" : "text-subtle-light hover:text-primary")">ATS rank</a>
+                <a asp-action="Index" asp-route-sort="date" class="rounded-full px-3 py-1 @(!rankedByAts ? "bg-primary text-white" : "text-subtle-light hover:text-primary")">Applied date</a>
+        </div>
     </div>
 </section>
 
 @if (TempData["Error"] != null)
 {
-    <div class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">@TempData["Error"]</div>
+        <div class="alert alert-error mt-6">@TempData["Error"]</div>
 }
 @if (TempData["Success"] != null)
 {
-    <div class="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">@TempData["Success"]</div>
+        <div class="alert alert-success mt-6">@TempData["Success"]</div>
 }
 
-@if (!(Model?.Any() ?? false))
+@if (!(Model?.Applications?.Any() ?? false))
 {
-    <div class="card mt-10 border border-dashed border-slate-200 px-6 py-12 text-center text-slate-500">
-        <h3 class="text-lg font-semibold text-slate-700">No applications yet</h3>
+        <div class="card mt-10 border border-dashed border-border-light px-6 py-12 text-center text-subtle-light">
+            <h3 class="text-lg font-semibold text-content-light">No applications yet</h3>
         <p class="mt-1 text-sm">Encourage providers to share their job posts to capture more interest.</p>
     </div>
 }
 else
 {
     <div class="mt-8 space-y-5">
-        @foreach (var application in Model)
+    @foreach (var application in Model.Applications)
         {
             <article class="card space-y-5 p-6">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <p class="text-xs uppercase tracking-wide text-slate-400">@application.AppliedAt.ToString("MMM d, yyyy")</p>
-                        <h2 class="text-xl font-semibold text-slate-900">
-                            <a asp-area="" asp-controller="Jobs" asp-action="Details" asp-route-id="@application.JobId" class="hover:underline">@application.Job?.Title</a>
+                        <p class="text-xs uppercase tracking-wide text-subtle-light opacity-80">@application.AppliedAt.ToString("MMM d, yyyy")</p>
+                        <h2 class="text-xl font-semibold text-content-light">
+                            <a asp-area="" asp-controller="Jobs" asp-action="Details" asp-route-id="@application.JobId" class="hover:underline">@application.JobTitle</a>
                         </h2>
-                        <p class="text-sm text-slate-500">@application.Applicant?.FullName ?? application.Applicant?.Email</p>
-                        <p class="text-xs text-slate-400">@application.Applicant?.Email</p>
+                        <p class="text-sm text-subtle-light">@application.ApplicantName</p>
+                        <p class="text-xs text-subtle-light opacity-80">@application.ApplicantEmail</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <span class="pill bg-primary-50 text-primary-600">@application.Status</span>
-                        @if (!string.IsNullOrWhiteSpace(application.Applicant?.ResumeFileName))
+                        @if (!string.IsNullOrWhiteSpace(application.ResumeUrl))
                         {
-                            <a href="@application.Applicant.ResumeFileName" target="_blank" class="btn btn-secondary">Resume</a>
+                            <a href="@application.ResumeUrl" target="_blank" class="btn btn-secondary">Resume</a>
                         }
                     </div>
                 </div>
 
+                @if (Model.HasAtsData && application.AtsScore.HasValue)
+                {
+                    <div class="rounded-xl border border-border-light bg-white/80 p-4 text-xs text-subtle-light">
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-content-light">ATS score</span>
+                            <span class="text-sm font-semibold text-primary">@application.AtsScore.Value</span>
+                        </div>
+                        @if (application.AtsMatchedKeywords?.Any() == true)
+                        {
+                            <p class="mt-2"><span class="font-semibold text-content-light">Matches:</span> @string.Join(", ", application.AtsMatchedKeywords.Take(5))</p>
+                        }
+                        @if (application.AtsMissingKeywords?.Any() == true)
+                        {
+                            <p class="mt-1 text-subtle-light"><span class="font-semibold text-content-light">Missing:</span> @string.Join(", ", application.AtsMissingKeywords.Take(5))</p>
+                        }
+                    </div>
+                }
+
                 @if (!string.IsNullOrWhiteSpace(application.CoverLetter))
                 {
-                    <div class="rounded-xl border border-slate-200 bg-white/80 p-4 text-sm text-slate-600">
-                        <p class="font-medium text-slate-500">Cover letter</p>
+                    <div class="rounded-xl border border-border-light bg-white/80 p-4 text-sm text-subtle-light">
+                        <p class="font-medium text-subtle-light">Cover letter</p>
                         <p class="mt-2 whitespace-pre-line">@application.CoverLetter</p>
                     </div>
                 }
 
                 <form asp-action="UpdateStatus" method="post" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@application.Id" />
+                    <input type="hidden" name="id" value="@application.ApplicationId" />
+                    <input type="hidden" name="sort" value="@sortOrder" />
                     <div class="input-group sm:w-1/3">
-                        <label class="text-sm font-medium text-slate-600">Update status</label>
-                        <select name="status" class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                        <label class="text-sm font-medium text-content-light">Update status</label>
+                        <select name="status" class="w-full rounded-xl border border-border-light bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
                             @foreach (var status in statusOptions)
                             {
                                 <option value="@status" selected="@(status == application.Status ? "selected" : null)">@status</option>

@@ -2,18 +2,18 @@
 @{
     ViewData["Title"] = "Manage users";
 }
-<section class="admin-users">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="space-y-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="h3 mb-0">Users</h1>
-            <p class="text-muted mb-0">Promote administrators or moderate member accounts.</p>
+            <h1 class="text-3xl font-semibold text-content-light">Users</h1>
+            <p class="text-sm text-subtle-light">Promote administrators or moderate member accounts.</p>
         </div>
         <a asp-area="Admin" asp-controller="Users" asp-action="CreateAdmin" class="btn btn-primary">Add admin</a>
     </div>
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+        <div class="alert alert-error">@TempData["Error"]</div>
     }
     @if (TempData["Info"] != null)
     {
@@ -24,61 +24,63 @@
         <div class="alert alert-success">@TempData["Success"]</div>
     }
 
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table mb-0">
-                <thead>
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-border-light text-left text-sm">
+                <thead class="bg-background-light text-xs font-semibold uppercase tracking-wide text-subtle-light">
                     <tr>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Roles</th>
-                        <th>Joined</th>
-                        <th>Jobs</th>
-                        <th>Applications</th>
-                        <th class="text-right">Actions</th>
+                        <th class="px-6 py-3">User</th>
+                        <th class="px-6 py-3">Email</th>
+                        <th class="px-6 py-3">Roles</th>
+                        <th class="px-6 py-3">Joined</th>
+                        <th class="px-6 py-3">Jobs</th>
+                        <th class="px-6 py-3">Applications</th>
+                        <th class="px-6 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-border-light text-subtle-light">
                     @if (Model.Any())
                     {
                         foreach (var user in Model)
                         {
-                            <tr class="@(user.IsLockedOut ? "table-warning" : string.Empty)">
-                                <td>
-                                    <strong>@user.UserName</strong><br />
-                                    <span class="text-muted">@user.FullName</span>
+                            <tr class="@(user.IsLockedOut ? "bg-amber-50" : string.Empty) transition hover:bg-background-light/60">
+                                <td class="px-6 py-4">
+                                    <div class="font-semibold text-content-light">@user.UserName</div>
+                                    <div class="text-xs text-subtle-light opacity-80">@user.FullName</div>
                                 </td>
-                                <td>@user.Email</td>
-                                <td>
+                                <td class="px-6 py-4">@user.Email</td>
+                                <td class="px-6 py-4 space-x-2">
                                     @if (user.IsAdmin)
                                     {
-                                        <span class="badge badge-primary mr-1">Admin</span>
+                                        <span class="pill">Admin</span>
                                     }
                                     @if (user.IsProvider)
                                     {
-                                        <span class="badge badge-info">Provider</span>
+                                        <span class="pill bg-primary/20 text-primary-700">Provider</span>
                                     }
                                 </td>
-                                <td>@user.CreatedAt.ToLocalTime():d</td>
-                                <td>@user.JobsPosted</td>
-                                <td>@user.ApplicationsSubmitted</td>
-                                <td class="text-right">
-                                    <a asp-area="Admin" asp-controller="Users" asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-secondary">View</a>
-                                    @if (!user.IsAdmin)
-                                    {
-                                        <form asp-area="Admin" asp-controller="Users" asp-action="PromoteToAdmin" asp-route-id="@user.Id" method="post" class="d-inline">
+                                <td class="px-6 py-4">@user.CreatedAt.ToLocalTime():d</td>
+                                <td class="px-6 py-4">@user.JobsPosted</td>
+                                <td class="px-6 py-4">@user.ApplicationsSubmitted</td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex flex-wrap justify-end gap-2">
+                                        <a asp-area="Admin" asp-controller="Users" asp-action="Details" asp-route-id="@user.Id" class="btn btn-secondary">View</a>
+                                        @if (!user.IsAdmin)
+                                        {
+                                            <form asp-area="Admin" asp-controller="Users" asp-action="PromoteToAdmin" asp-route-id="@user.Id" method="post" class="inline-flex">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-secondary">Promote</button>
+                                            </form>
+                                        }
+                                        <form asp-area="Admin" asp-controller="Users" asp-action="ToggleLockout" asp-route-id="@user.Id" method="post" class="inline-flex">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Promote</button>
+                                            <button type="submit" class="btn btn-secondary">@(user.IsLockedOut ? "Enable" : "Disable")</button>
                                         </form>
-                                    }
-                                    <form asp-area="Admin" asp-controller="Users" asp-action="ToggleLockout" asp-route-id="@user.Id" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm @(user.IsLockedOut ? "btn-outline-success" : "btn-outline-warning")">@(user.IsLockedOut ? "Enable" : "Disable")</button>
-                                    </form>
-                                    <form asp-area="Admin" asp-controller="Users" asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this user? This will remove their jobs and applications.');">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
+                                        <form asp-area="Admin" asp-controller="Users" asp-action="Delete" asp-route-id="@user.Id" method="post" class="inline-flex" onsubmit="return confirm('Delete this user? This will remove their jobs and applications.');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-secondary text-red-500">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -86,7 +88,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">No users found.</td>
+                            <td colspan="7" class="px-6 py-8 text-center text-subtle-light">No users found.</td>
                         </tr>
                     }
                 </tbody>

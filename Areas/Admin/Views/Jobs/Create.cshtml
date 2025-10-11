@@ -4,72 +4,72 @@
 }
 <section class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
-        <h1 class="text-3xl font-semibold text-slate-900">Create job</h1>
-        <p class="text-sm text-slate-500">Provide clear details so candidates know if they're a match.</p>
+        <h1 class="text-3xl font-semibold text-content-light">Create job</h1>
+        <p class="text-sm text-subtle-light">Provide clear details so candidates know if they're a match.</p>
     </div>
 </section>
 
 <form asp-action="Create" method="post" enctype="multipart/form-data" class="card mt-8 space-y-8 p-10">
-    <div asp-validation-summary="ModelOnly" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert"></div>
+    <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
 
     <div class="grid gap-6 lg:grid-cols-2">
         <div class="input-group">
-            <label asp-for="Title" class="text-sm font-medium text-slate-600"></label>
-            <input asp-for="Title" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+            <label asp-for="Title" class="text-sm font-medium text-content-light"></label>
+            <input asp-for="Title" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
             <span asp-validation-for="Title" class="text-sm text-red-500"></span>
         </div>
         <div class="input-group">
-            <label asp-for="JobType" class="text-sm font-medium text-slate-600"></label>
-            <input asp-for="JobType" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" placeholder="Full-time, Part-time, Remote" />
+            <label asp-for="JobType" class="text-sm font-medium text-content-light"></label>
+            <input asp-for="JobType" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" placeholder="Full-time, Part-time, Remote" />
             <span asp-validation-for="JobType" class="text-sm text-red-500"></span>
         </div>
         <div class="input-group">
-            <label asp-for="CompanyName" class="text-sm font-medium text-slate-600"></label>
-            <input asp-for="CompanyName" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+            <label asp-for="CompanyName" class="text-sm font-medium text-content-light"></label>
+            <input asp-for="CompanyName" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
             <span asp-validation-for="CompanyName" class="text-sm text-red-500"></span>
         </div>
         <div class="input-group">
-            <label asp-for="CompanyWebsite" class="text-sm font-medium text-slate-600"></label>
-            <input asp-for="CompanyWebsite" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+            <label asp-for="CompanyWebsite" class="text-sm font-medium text-content-light"></label>
+            <input asp-for="CompanyWebsite" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
             <span asp-validation-for="CompanyWebsite" class="text-sm text-red-500"></span>
         </div>
         <div class="input-group">
-            <label asp-for="Location" class="text-sm font-medium text-slate-600"></label>
-            <input asp-for="Location" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+            <label asp-for="Location" class="text-sm font-medium text-content-light"></label>
+            <input asp-for="Location" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
             <span asp-validation-for="Location" class="text-sm text-red-500"></span>
         </div>
         <div class="input-group">
-            <label asp-for="Country" class="text-sm font-medium text-slate-600"></label>
-            <input asp-for="Country" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+            <label asp-for="Country" class="text-sm font-medium text-content-light"></label>
+            <input asp-for="Country" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
             <span asp-validation-for="Country" class="text-sm text-red-500"></span>
         </div>
         <div class="input-group">
-            <label asp-for="Salary" class="text-sm font-medium text-slate-600"></label>
-            <input asp-for="Salary" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+            <label asp-for="Salary" class="text-sm font-medium text-content-light"></label>
+            <input asp-for="Salary" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
         </div>
         <div class="input-group">
-            <label class="text-sm font-medium text-slate-600">Company logo</label>
-            <input type="file" name="companyLogo" class="w-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-3 text-sm focus:border-primary-500 focus:ring-primary-500" />
+            <label class="text-sm font-medium text-content-light">Company logo</label>
+            <input type="file" name="companyLogo" class="w-full rounded-xl border border-dashed border-border-light bg-white px-4 py-3 text-sm focus:border-primary-500 focus:ring-primary-500" />
         </div>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">
         <div class="input-group lg:col-span-2">
-            <label asp-for="Description" class="text-sm font-medium text-slate-600"></label>
-            <textarea asp-for="Description" rows="6" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+            <label asp-for="Description" class="text-sm font-medium text-content-light"></label>
+            <textarea asp-for="Description" rows="6" class="w-full rounded-2xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
             <span asp-validation-for="Description" class="text-sm text-red-500"></span>
         </div>
         <div class="input-group">
-            <label asp-for="Qualifications" class="text-sm font-medium text-slate-600"></label>
-            <textarea asp-for="Qualifications" rows="4" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+            <label asp-for="Qualifications" class="text-sm font-medium text-content-light"></label>
+            <textarea asp-for="Qualifications" rows="4" class="w-full rounded-2xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
         </div>
         <div class="input-group">
-            <label asp-for="Experience" class="text-sm font-medium text-slate-600"></label>
-            <textarea asp-for="Experience" rows="4" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+            <label asp-for="Experience" class="text-sm font-medium text-content-light"></label>
+            <textarea asp-for="Experience" rows="4" class="w-full rounded-2xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
         </div>
         <div class="lg:col-span-2 input-group">
-            <label asp-for="Skills" class="text-sm font-medium text-slate-600"></label>
-            <textarea asp-for="Skills" rows="4" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
+            <label asp-for="Skills" class="text-sm font-medium text-content-light"></label>
+            <textarea asp-for="Skills" rows="4" class="w-full rounded-2xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"></textarea>
         </div>
     </div>
 

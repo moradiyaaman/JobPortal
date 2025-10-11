@@ -2,44 +2,50 @@
 @{
     ViewData["Title"] = "Add administrator";
 }
-<section class="create-admin">
-    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-link mb-3">← Back to users</a>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h1 class="h4 mb-3">Create administrator account</h1>
-            <form asp-area="Admin" asp-controller="Users" asp-action="CreateAdmin" method="post">
-                @Html.AntiForgeryToken()
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-                <div class="form-group">
-                    <label asp-for="UserName"></label>
-                    <input asp-for="UserName" class="form-control" />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="FullName"></label>
-                    <input asp-for="FullName" class="form-control" />
-                    <span asp-validation-for="FullName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Email"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Password"></label>
-                    <input asp-for="Password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ConfirmPassword"></label>
-                    <input asp-for="ConfirmPassword" class="form-control" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Create admin</button>
-            </form>
+<section class="space-y-6">
+    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-secondary w-fit">← Back to users</a>
+    <div class="card space-y-6 p-10">
+        <div>
+            <h1 class="text-2xl font-semibold text-content-light">Create administrator account</h1>
+            <p class="text-sm text-subtle-light">Grant elevated access to teammates who help run the marketplace.</p>
         </div>
+        <form asp-area="Admin" asp-controller="Users" asp-action="CreateAdmin" method="post" class="space-y-6">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <div class="space-y-2">
+                    <label asp-for="UserName" class="text-sm font-medium text-content-light"></label>
+                    <input asp-for="UserName" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                    <span asp-validation-for="UserName" class="text-sm text-red-500"></span>
+                </div>
+                <div class="space-y-2">
+                    <label asp-for="FullName" class="text-sm font-medium text-content-light"></label>
+                    <input asp-for="FullName" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                    <span asp-validation-for="FullName" class="text-sm text-red-500"></span>
+                </div>
+                <div class="space-y-2 md:col-span-2">
+                    <label asp-for="Email" class="text-sm font-medium text-content-light"></label>
+                    <input asp-for="Email" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                    <span asp-validation-for="Email" class="text-sm text-red-500"></span>
+                </div>
+                <div class="space-y-2">
+                    <label asp-for="Password" class="text-sm font-medium text-content-light"></label>
+                    <input asp-for="Password" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                    <span asp-validation-for="Password" class="text-sm text-red-500"></span>
+                </div>
+                <div class="space-y-2">
+                    <label asp-for="ConfirmPassword" class="text-sm font-medium text-content-light"></label>
+                    <input asp-for="ConfirmPassword" class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" />
+                    <span asp-validation-for="ConfirmPassword" class="text-sm text-red-500"></span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center">
+                <button type="submit" class="btn btn-primary">Create admin</button>
+                <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
 </section>
 

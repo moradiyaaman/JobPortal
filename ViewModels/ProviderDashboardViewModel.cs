@@ -39,6 +39,8 @@ namespace JobPortal.ViewModels
         public int JobId { get; set; }
         public string JobTitle { get; set; }
         public IEnumerable<ProviderApplicationItemViewModel> Applications { get; set; }
+        public string SortOrder { get; set; }
+        public bool HasAtsData { get; set; }
     }
 
     public class ProviderApplicationItemViewModel
@@ -50,5 +52,8 @@ namespace JobPortal.ViewModels
         public string Status { get; set; }
         public string ResumeUrl { get; set; }
         public string CoverLetter { get; set; }
+        public int? AtsScore { get; set; }
+        public IReadOnlyCollection<string> AtsMatchedKeywords { get; set; }
+        public IReadOnlyCollection<string> AtsMissingKeywords { get; set; }
     }
 }

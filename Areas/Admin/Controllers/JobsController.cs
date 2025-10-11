@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace JobPortal.Areas.Admin.Controllers
 {
@@ -18,11 +19,13 @@ namespace JobPortal.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<JobsController> _logger;
 
-        public JobsController(ApplicationDbContext context, IWebHostEnvironment environment)
+        public JobsController(ApplicationDbContext context, IWebHostEnvironment environment, ILogger<JobsController> logger)
         {
             _context = context;
             _environment = environment;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -49,37 +52,46 @@ namespace JobPortal.Areas.Admin.Controllers
             return View(job);
         }
 
-        public IActionResult Create()
-        {
-            return View(new Job());
-        }
+        //public IActionResult Create()
+        //{
+        //    return View(new Job());
+        //}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Job job, IFormFile companyLogo)
-        {
-            if (companyLogo != null && companyLogo.Length > 0 && !IsLogoExtensionAllowed(companyLogo))
-            {
-                ModelState.AddModelError(string.Empty, "Please upload a logo in PNG, JPG, or SVG format.");
-                return View(job);
-            }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create(Job job, IFormFile companyLogo)
+        //{
+        //    if (companyLogo != null && companyLogo.Length > 0 && !IsLogoExtensionAllowed(companyLogo))
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Please upload a logo in PNG, JPG, or SVG format.");
+        //        return View(job);
+        //    }
 
-            if (!ModelState.IsValid)
-            {
-                return View(job);
-            }
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(job);
+        //    }
 
-            if (companyLogo != null && companyLogo.Length > 0)
-            {
-                job.CompanyLogoPath = await SaveLogo(companyLogo);
-            }
+        //    if (companyLogo != null && companyLogo.Length > 0)
+        //    {
+        //        try
+        //        {
+        //            job.CompanyLogoPath = await SaveLogo(companyLogo);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            _logger.LogError(ex, "Admin Create: Failed to save company logo for job '{Title}'", job?.Title);
+        //            ModelState.AddModelError(string.Empty, "We couldn't save the logo. Please try again or use a different image.");
+        //            return View(job);
+        //        }
+        //    }
 
-            job.PostedAt = DateTime.UtcNow;
-            _context.Jobs.Add(job);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Job created successfully.";
-            return RedirectToAction(nameof(Index));
-        }
+        //    job.PostedAt = DateTime.UtcNow;
+        //    _context.Jobs.Add(job);
+        //    await _context.SaveChangesAsync();
+        //    TempData["Success"] = "Job created successfully.";
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -132,7 +144,16 @@ namespace JobPortal.Areas.Admin.Controllers
 
             if (companyLogo != null && companyLogo.Length > 0)
             {
-                existingJob.CompanyLogoPath = await SaveLogo(companyLogo);
+                try
+                {
+                    existingJob.CompanyLogoPath = await SaveLogo(companyLogo);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Admin Edit: Failed to save company logo for job Id {JobId}", id);
+                    ModelState.AddModelError(string.Empty, "We couldn't save the new logo. Please try again.");
+                    return View(existingJob);
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -189,14 +210,46 @@ namespace JobPortal.Areas.Admin.Controllers
 
         private async Task<string> SaveLogo(IFormFile logoFile)
         {
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "logos");
-            Directory.CreateDirectory(uploadsFolder);
+            // Validate content length (basic guard in addition to request limits)
+            if (logoFile.Length <= 0) throw new InvalidOperationException("Logo file is empty.");
+
+            // Resolve a valid web root
+            var webRoot = _environment.WebRootPath;
+            if (string.IsNullOrEmpty(webRoot))
+            {
+                var contentRoot = _environment.ContentRootPath;
+                if (string.IsNullOrEmpty(contentRoot))
+                {
+                    throw new InvalidOperationException("Cannot resolve a storage root for uploads.");
+                }
+                webRoot = Path.Combine(contentRoot, "wwwroot");
+            }
+
+            var uploadsFolder = Path.Combine(webRoot, "uploads", "logos");
+            try
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to create admin logo directory {Dir}", uploadsFolder);
+                throw;
+            }
+
             var fileName = $"logo_{Guid.NewGuid()}{Path.GetExtension(logoFile.FileName)}";
             var filePath = Path.Combine(uploadsFolder, fileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
+
+            try
             {
+                await using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 1048576, useAsync: true);
                 await logoFile.CopyToAsync(stream);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to save admin logo at {Path}", filePath);
+                throw;
+            }
+
             return $"/uploads/logos/{fileName}";
         }
 

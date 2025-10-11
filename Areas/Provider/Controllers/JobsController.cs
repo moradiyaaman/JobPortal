@@ -19,6 +19,7 @@ namespace JobPortal.Areas.Provider.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailService _emailService;
+        private readonly IAtsScorer _atsScorer;
         private static readonly string[] ApplicationStatuses = new[]
         {
             "Applied",
@@ -29,11 +30,12 @@ namespace JobPortal.Areas.Provider.Controllers
             "Rejected"
         };
 
-        public JobsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService)
+        public JobsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService, IAtsScorer atsScorer)
         {
             _context = context;
             _userManager = userManager;
             _emailService = emailService;
+            _atsScorer = atsScorer;
         }
 
         public async Task<IActionResult> Index()
@@ -251,7 +253,7 @@ namespace JobPortal.Areas.Provider.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Applications(int id)
+        public async Task<IActionResult> Applications(int id, string sort = "rank")
         {
             var provider = await _userManager.GetUserAsync(User);
             if (provider == null)
@@ -269,32 +271,56 @@ namespace JobPortal.Areas.Provider.Controllers
                 return NotFound();
             }
 
+            var sortOrder = string.Equals(sort, "date", StringComparison.OrdinalIgnoreCase) ? "date" : "rank";
+
+            // Compute ATS rank for each app (best-effort). Fallback to applied date if scorer fails.
+            var ranked = await Task.WhenAll(job.Applications
+                .Select(async a => new
+                {
+                    App = a,
+                    Rank = await _atsScorer.RankScoreAsync(a.Applicant, job, a.CoverLetter) ?? new AtsRankResult
+                    {
+                        Score = 0,
+                        MatchedKeywords = Array.Empty<string>(),
+                        MissingKeywords = Array.Empty<string>()
+                    }
+                }));
+
+            var ordered = sortOrder == "date"
+                ? ranked.OrderByDescending(x => x.App.AppliedAt).ThenByDescending(x => x.Rank.Score)
+                : ranked.OrderByDescending(x => x.Rank.Score).ThenByDescending(x => x.App.AppliedAt);
+
             var model = new ProviderJobApplicationsViewModel
             {
                 JobId = job.Id,
                 JobTitle = job.Title,
-                Applications = job.Applications
-                    .OrderByDescending(a => a.AppliedAt)
-                    .Select(a => new ProviderApplicationItemViewModel
+                SortOrder = sortOrder,
+                HasAtsData = ranked.Any(x => x.Rank.Score > 0 || (x.Rank.MatchedKeywords?.Length ?? 0) > 0),
+                Applications = ordered
+                    .Select(x => new ProviderApplicationItemViewModel
                     {
-                        ApplicationId = a.Id,
-                        ApplicantName = a.Applicant.FullName ?? a.Applicant.Email,
-                        ApplicantEmail = a.Applicant.Email,
-                        AppliedAt = a.AppliedAt,
-                        Status = a.Status,
-                        ResumeUrl = a.Applicant.ResumeFileName,
-                        CoverLetter = a.CoverLetter
+                        ApplicationId = x.App.Id,
+                        ApplicantName = x.App.Applicant.FullName ?? x.App.Applicant.Email,
+                        ApplicantEmail = x.App.Applicant.Email,
+                        AppliedAt = x.App.AppliedAt,
+                        Status = x.App.Status,
+                        ResumeUrl = x.App.Applicant.ResumeFileName,
+                        CoverLetter = x.App.CoverLetter,
+                        AtsScore = x.Rank.Score,
+                        AtsMatchedKeywords = x.Rank.MatchedKeywords ?? Array.Empty<string>(),
+                        AtsMissingKeywords = x.Rank.MissingKeywords ?? Array.Empty<string>()
                     })
             };
 
             ViewBag.StatusOptions = ApplicationStatuses;
+            ViewBag.RankedByAts = sortOrder != "date";
             return View(model);
         }
 
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateApplicationStatus(int id, string status)
+        public async Task<IActionResult> UpdateApplicationStatus(int id, string status, string sort)
         {
             var provider = await _userManager.GetUserAsync(User);
             if (provider == null)
@@ -341,7 +367,8 @@ namespace JobPortal.Areas.Provider.Controllers
             }
 
             TempData["Success"] = "Application status updated.";
-            return RedirectToAction(nameof(Applications), new { id = application.JobId });
+            var redirectSort = string.Equals(sort, "date", StringComparison.OrdinalIgnoreCase) ? "date" : "rank";
+            return RedirectToAction(nameof(Applications), new { id = application.JobId, sort = redirectSort });
         }
     }
 }

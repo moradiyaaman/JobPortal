@@ -2,62 +2,100 @@
 @{
     ViewData["Title"] = "User details";
 }
-<section class="user-details">
-    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-link mb-3">← Back to users</a>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h1 class="h4">@Model.UserName</h1>
-            <p class="text-muted mb-3">@Model.Email</p>
+<section class="space-y-6">
+    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-secondary w-fit">← Back to users</a>
+    <div class="card space-y-8 p-10">
+        <header class="space-y-1">
+            <h1 class="text-2xl font-semibold text-content-light">@Model.UserName</h1>
+            <p class="text-sm text-subtle-light">@Model.Email</p>
+        </header>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <h2 class="h6 text-uppercase text-muted">Profile</h2>
-                    <dl class="row">
-                        <dt class="col-sm-4">Full name</dt>
-                        <dd class="col-sm-8">@Model.FullName</dd>
-                        <dt class="col-sm-4">Mobile</dt>
-                        <dd class="col-sm-8">@Model.Mobile</dd>
-                        <dt class="col-sm-4">Country</dt>
-                        <dd class="col-sm-8">@Model.Country</dd>
-                        <dt class="col-sm-4">Address</dt>
-                        <dd class="col-sm-8">@Model.Address</dd>
-                        <dt class="col-sm-4">Headline</dt>
-                        <dd class="col-sm-8">@Model.Headline</dd>
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <h2 class="h6 text-uppercase text-muted">Account</h2>
-                    <ul class="list-unstyled">
-                        <li><strong>Roles:</strong> @(Model.IsAdmin ? "Admin" : "User") @(Model.IsProvider ? ", Provider" : string.Empty)</li>
-                        <li><strong>Email confirmed:</strong> @(Model.EmailConfirmed ? "Yes" : "No")</li>
-                        <li><strong>Locked out:</strong> @(Model.IsLockedOut ? "Yes" : "No")</li>
-                        <li><strong>Joined:</strong> @Model.CreatedAt.ToLocalTime():f</li>
-                        <li><strong>Jobs posted:</strong> @Model.JobsPosted</li>
-                        <li><strong>Applications:</strong> @Model.ApplicationsSubmitted</li>
-                    </ul>
-                </div>
-            </div>
-
-            @if (Model.IsProvider)
-            {
-                <hr />
-                <h2 class="h5">Company details</h2>
-                <dl class="row">
-                    <dt class="col-sm-3">Company</dt>
-                    <dd class="col-sm-9">@Model.CompanyName</dd>
-                    <dt class="col-sm-3">Website</dt>
-                    <dd class="col-sm-9">
-                        @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
-                        {
-                            <a href="@Model.CompanyWebsite" target="_blank" rel="noopener">@Model.CompanyWebsite</a>
-                        }
-                    </dd>
-                    <dt class="col-sm-3">Location</dt>
-                    <dd class="col-sm-9">@Model.CompanyLocation</dd>
-                    <dt class="col-sm-3">About</dt>
-                    <dd class="col-sm-9">@Model.CompanyDescription</dd>
+        <div class="grid gap-8 lg:grid-cols-2">
+            <section class="space-y-4">
+                <h2 class="text-xs font-semibold uppercase tracking-wide text-subtle-light opacity-80">Profile</h2>
+                <dl class="grid gap-3 text-sm text-subtle-light">
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Full name</dt>
+                        <dd class="text-right">@Model.FullName</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Mobile</dt>
+                        <dd class="text-right">@Model.Mobile</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Country</dt>
+                        <dd class="text-right">@Model.Country</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Address</dt>
+                        <dd class="text-right">@Model.Address</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Headline</dt>
+                        <dd class="text-right">@Model.Headline</dd>
+                    </div>
                 </dl>
-            }
+            </section>
+
+            <section class="space-y-4">
+                <h2 class="text-xs font-semibold uppercase tracking-wide text-subtle-light opacity-80">Account</h2>
+                <dl class="grid gap-3 text-sm text-subtle-light">
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Roles</dt>
+                        <dd class="text-right">@(Model.IsAdmin ? "Admin" : "User")@(Model.IsProvider ? ", Provider" : string.Empty)</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Email confirmed</dt>
+                        <dd class="text-right">@(Model.EmailConfirmed ? "Yes" : "No")</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Locked out</dt>
+                        <dd class="text-right">@(Model.IsLockedOut ? "Yes" : "No")</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Joined</dt>
+                        <dd class="text-right">@Model.CreatedAt.ToLocalTime():f</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Jobs posted</dt>
+                        <dd class="text-right">@Model.JobsPosted</dd>
+                    </div>
+                    <div class="flex justify-between gap-8">
+                        <dt class="font-medium text-content-light">Applications</dt>
+                        <dd class="text-right">@Model.ApplicationsSubmitted</dd>
+                    </div>
+                </dl>
+            </section>
         </div>
+
+        @if (Model.IsProvider)
+        {
+            <section class="rounded-2xl border border-border-light bg-background-light/60 p-6 text-sm text-subtle-light">
+                <h2 class="text-xs font-semibold uppercase tracking-wide text-subtle-light opacity-80">Company details</h2>
+                <dl class="mt-4 space-y-3">
+                    <div class="flex justify-between gap-6">
+                        <dt class="font-medium text-content-light">Company</dt>
+                        <dd class="text-right">@Model.CompanyName</dd>
+                    </div>
+                    <div class="flex justify-between gap-6">
+                        <dt class="font-medium text-content-light">Website</dt>
+                        <dd class="text-right">
+                            @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
+                            {
+                                <a href="@Model.CompanyWebsite" target="_blank" rel="noopener" class="text-primary hover:text-primary-700">@Model.CompanyWebsite</a>
+                            }
+                        </dd>
+                    </div>
+                    <div class="flex justify-between gap-6">
+                        <dt class="font-medium text-content-light">Location</dt>
+                        <dd class="text-right">@Model.CompanyLocation</dd>
+                    </div>
+                    <div class="flex justify-between gap-6">
+                        <dt class="font-medium text-content-light">About</dt>
+                        <dd class="text-right">@Model.CompanyDescription</dd>
+                    </div>
+                </dl>
+            </section>
+        }
     </div>
 </section>
