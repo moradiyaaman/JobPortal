@@ -109,7 +109,7 @@ namespace JobPortal.Services
 
             int words = text.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries).Length;
             double contentPct = words < 250 ? 0.4 : words > 1200 ? 0.6 : 1.0;
-            if (words < 250) suggestions.Add("Increase content (aim for 1�2 pages with concrete details).");
+            if (words < 250) suggestions.Add("Increase content (aim for 1 to 2 pages with concrete details).");
             if (words > 1200) suggestions.Add("Trim content (keep it concise and focused).");
             score += (int)Math.Round(contentPct * 20);
 

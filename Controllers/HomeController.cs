@@ -24,6 +24,23 @@ namespace JobPortal.Controllers
 
         public async Task<IActionResult> Index()
         {
+            string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ApplicationUser currentUser = null;
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                currentUser = await _context.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == currentUserId);
+            }
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Provider") || currentUser?.IsProvider == true)
+                {
+                    return RedirectToAction("Index", "Dashboard", new { area = "Provider" });
+                }
+            }
+
             var jobs = await _context.Jobs
                 .Where(j => j.IsActive)
                 .OrderByDescending(j => j.PostedAt)
@@ -40,13 +57,6 @@ namespace JobPortal.Controllers
                     PostedAt = j.PostedAt
                 })
                 .ToListAsync();
-
-            string currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            ApplicationUser currentUser = null;
-            if (!string.IsNullOrEmpty(currentUserId))
-            {
-                currentUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == currentUserId);
-            }
 
             var stats = new HomeStatsViewModel
             {

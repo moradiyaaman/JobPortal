@@ -220,6 +220,8 @@ namespace JobPortal.Controllers
             return View(model);
         }
 
+        [RequestSizeLimit(100 * 1024 * 1024)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 100 * 1024 * 1024, ValueLengthLimit = int.MaxValue, MultipartHeadersLengthLimit = int.MaxValue)]
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Profile(ProfileViewModel model)
@@ -291,7 +293,8 @@ namespace JobPortal.Controllers
                     return View(model);
                 }
 
-                if (!IsResumeContentSafe(model.ResumeFile))
+                var isResumeSafe = await IsResumeContentSafeAsync(model.ResumeFile);
+                if (!isResumeSafe)
                 {
                     ModelState.AddModelError("ResumeFile", "The resume file content does not match the allowed types.");
                     return View(model);
@@ -380,7 +383,8 @@ namespace JobPortal.Controllers
                     return View(model);
                 }
 
-                if (!IsCompanyLogoContentSafe(model.CompanyLogoFile))
+                var isLogoSafe = await IsCompanyLogoContentSafeAsync(model.CompanyLogoFile);
+                if (!isLogoSafe)
                 {
                     ModelState.AddModelError(nameof(model.CompanyLogoFile), "The logo file content does not match the allowed image types.");
                     return View(model);
@@ -524,54 +528,78 @@ namespace JobPortal.Controllers
             [".svg"] = new[] { "image/svg+xml" }
         };
 
-        private bool IsResumeContentSafe(IFormFile file)
+        private async Task<bool> IsResumeContentSafeAsync(IFormFile file)
         {
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!ResumeAllowedMimeTypes.TryGetValue(extension, out var allowedTypes))
+            try
             {
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!ResumeAllowedMimeTypes.TryGetValue(extension, out var allowedTypes))
+                {
+                    return false;
+                }
+
+                if (!IsContentTypeExpected(file.ContentType, allowedTypes))
+                {
+                    return false;
+                }
+
+                using var stream = file.OpenReadStream();
+                switch (extension)
+                {
+                    case ".pdf":
+                        return await MatchesSignatureAsync(stream, PdfSignatureBytes);
+                    case ".doc":
+                        return await MatchesSignatureAsync(stream, DocSignatureBytes);
+                    case ".docx":
+                        return await MatchesSignatureAsync(stream, DocxSignatureBytes);
+                    default:
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating resume content for file {FileName}", file?.FileName);
                 return false;
             }
-
-            if (!IsContentTypeExpected(file.ContentType, allowedTypes))
-            {
-                return false;
-            }
-
-            using var stream = file.OpenReadStream();
-            return extension switch
-            {
-                ".pdf" => MatchesSignature(stream, PdfSignatureBytes),
-                ".doc" => MatchesSignature(stream, DocSignatureBytes),
-                ".docx" => MatchesSignature(stream, DocxSignatureBytes),
-                _ => false
-            };
         }
 
-        private bool IsCompanyLogoContentSafe(IFormFile file)
+        private async Task<bool> IsCompanyLogoContentSafeAsync(IFormFile file)
         {
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!LogoAllowedMimeTypes.TryGetValue(extension, out var allowedTypes))
+            try
             {
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!LogoAllowedMimeTypes.TryGetValue(extension, out var allowedTypes))
+                {
+                    return false;
+                }
+
+                if (!IsContentTypeExpected(file.ContentType, allowedTypes))
+                {
+                    return false;
+                }
+
+                using var stream = file.OpenReadStream();
+                switch (extension)
+                {
+                    case ".png":
+                        return await MatchesSignatureAsync(stream, PngSignatureBytes);
+                    case ".jpg":
+                    case ".jpeg":
+                        return await MatchesSignatureAsync(stream, JpegSignatureBytes);
+                    case ".svg":
+                        return await IsSafeSvgAsync(stream);
+                    default:
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating company logo content for file {FileName}", file?.FileName);
                 return false;
             }
-
-            if (!IsContentTypeExpected(file.ContentType, allowedTypes))
-            {
-                return false;
-            }
-
-            using var stream = file.OpenReadStream();
-            return extension switch
-            {
-                ".png" => MatchesSignature(stream, PngSignatureBytes),
-                ".jpg" => MatchesSignature(stream, JpegSignatureBytes),
-                ".jpeg" => MatchesSignature(stream, JpegSignatureBytes),
-                ".svg" => IsSafeSvg(stream),
-                _ => false
-            };
         }
 
-        private static bool MatchesSignature(Stream stream, params byte[][] signatures)
+        private static async Task<bool> MatchesSignatureAsync(Stream stream, params byte[][] signatures)
         {
             var nonNull = signatures?.Where(s => s != null && s.Length > 0).ToList();
             if (nonNull == null || nonNull.Count == 0)
@@ -581,23 +609,18 @@ namespace JobPortal.Controllers
 
             var maxLength = nonNull.Max(s => s.Length);
             var buffer = new byte[maxLength];
-            var read = stream.Read(buffer, 0, maxLength);
-            stream.Position = 0;
+            var read = await stream.ReadAsync(buffer, 0, maxLength);
+            stream.Position = 0; // reset for downstream consumers
 
             foreach (var signature in nonNull)
             {
-                if (read >= signature.Length && buffer.AsSpan(0, signature.Length).SequenceEqual(signature))
+                if (read >= signature.Length && new ReadOnlySpan<byte>(buffer, 0, signature.Length).SequenceEqual(signature))
                 {
                     return true;
                 }
             }
 
             return false;
-        }
-
-        private static bool MatchesSignature(Stream stream, byte[] signature)
-        {
-            return MatchesSignature(stream, new[] { signature });
         }
 
         private static bool IsContentTypeExpected(string contentType, IReadOnlyCollection<string> allowed)
@@ -615,10 +638,10 @@ namespace JobPortal.Controllers
             return allowed.Any(t => string.Equals(t, contentType, StringComparison.OrdinalIgnoreCase));
         }
 
-        private static bool IsSafeSvg(Stream stream)
+        private static async Task<bool> IsSafeSvgAsync(Stream stream)
         {
-            using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 4096, leaveOpen: false);
-            var content = reader.ReadToEnd();
+            using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 4096, leaveOpen: true);
+            var content = await reader.ReadToEndAsync();
             if (string.IsNullOrWhiteSpace(content))
             {
                 return false;

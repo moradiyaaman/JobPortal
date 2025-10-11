@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -52,11 +53,25 @@ namespace JobPortal
                 options.AccessDeniedPath = "/Account/AccessDenied";
             });
 
-            // Increase multipart/form-data upload limit (IIS/Kestrel agnostic)
+            // Increase multipart/form-data limits (affects model binding)
             services.Configure<FormOptions>(o =>
             {
-                // 100 MB default limit for resume/logo uploads
-                o.MultipartBodyLengthLimit = 100 * 1024 * 1024;
+                o.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
+                o.ValueLengthLimit = int.MaxValue;
+                o.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+
+            // Ensure large uploads work in both hosting modes
+            services.Configure<IISServerOptions>(o =>
+            {
+                o.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+                // Some components in IIS Express may still use sync IO in .NET Core 3.1
+                o.AllowSynchronousIO = true;
+            });
+
+            services.Configure<KestrelServerOptions>(o =>
+            {
+                o.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
             });
 
             services.AddControllersWithViews();
@@ -82,13 +97,12 @@ namespace JobPortal
                 try
                 {
                     var conn = db.Database.GetDbConnection();
-                    var builder = new SqlConnectionStringBuilder(conn.ConnectionString);
+                    var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(conn.ConnectionString);
                     var applied = db.Database.GetAppliedMigrations().ToList();
                     logger.LogInformation("Connected to SQL Server {Server} / DB {Database}. Applied migrations: {Count}. Last: {Last}", builder.DataSource, builder.InitialCatalog, applied.Count, applied.LastOrDefault());
                 }
                 catch (Exception ex)
                 {
-                    // Best-effort diagnostics
                     var applied = db.Database.GetAppliedMigrations().ToList();
                     var last = applied.LastOrDefault();
                     var count = applied.Count;
@@ -106,7 +120,6 @@ namespace JobPortal
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
