@@ -5,29 +5,14 @@ A modern, minimalistic ASP.NET Core MVC application that connects job seekers an
 ## Features
 
 ### Job seekers
-- Account registration, login, and profile management with resume upload (PDF/DOC/DOCX, max 5 MB)
-- Browse and filter jobs by keyword, country, job type, and recency
-- View detailed job descriptions and apply with one click (prevents duplicate applications)
-- Track submitted applications with a timeline view
-- Contact administrators through the built-in inquiry form
 
 ### Administrators
-- Secure admin area with dashboard metrics (jobs, applications, users, messages)
-- Create, edit, and delete job listings with optional logo upload (PNG/JPG/SVG)
-- Inspect applicants per job and download their resumes
-- Review every application across the portal and jump to the public job listing
-- Respond to contact messages from job seekers
 
 ### Cross-cutting
-- ASP.NET Core Identity with SQL Server persistence
-- Seeded admin account and sample jobs for quick evaluation
-- Minimal, responsive UI themed around a light, spacious design across public and admin pages
 
 ## Getting started
 
 ### Prerequisites
-- [.NET SDK 6.0 or later](https://dotnet.microsoft.com/download). The project targets **.NET Core 3.1**, which is out of support; use the .NET 6+ SDK to build and run locally.
-- SQL Server LocalDB (installed with Visual Studio) or update the connection string to point to another SQL Server instance.
 
 ### Configure and run
 1. Restore packages and build:
@@ -44,12 +29,8 @@ A modern, minimalistic ASP.NET Core MVC application that connects job seekers an
 The first run migrates the database and seeds an admin user plus sample jobs.
 
 ### Seeded credentials
-- **Admin account:** `admin@jobportal.com`
-- **Password:** `Admin@123`
 
 ### Updating configuration
-- Connection string: `appsettings.json` → `ConnectionStrings:DefaultConnection`
-- Resume constraints: `appsettings.json` → `ResumeUpload`
 
 ### Database management
 If you change the data model, add a migration and apply it:
@@ -59,18 +40,49 @@ dotnet ef database update
 ```
 
 ## Folder structure highlights
-- `Controllers/` – Public controllers for home, account, jobs, and contact flows
-- `Areas/Admin/` – Admin controllers and views for dashboard, jobs, applications, messages
-- `Views/Shared/` – Shared layouts for public and admin UI
-- `Data/ApplicationDbContext.cs` – EF Core DbContext and relationship configuration
-- `Data/SeedData.cs` – Database initialization and seeding logic
-- `wwwroot/css/site.css` – Custom minimal UI theme
 
 ## Known limitations
-- Target framework is netcoreapp3.1 (out of support). Consider upgrading to .NET 8 for long-term maintenance.
-- No automated tests are currently included; add unit/integration tests before production deployment.
 
 ## Next steps
-- Upgrade the project to .NET 8 and update dependencies
-- Integrate email notifications for new applications or inquiries
-- Add pagination to job listings for large datasets
+
+## JobPortal
+
+## Overview
+JobPortal is a web-based job board platform built with ASP.NET Core, Entity Framework Core, and SQL Server. It allows job seekers to search and apply for jobs, and employers/providers to post and manage job listings. The platform also features job alerts, contact forms, and an admin dashboard for site management.
+
+## Features
+- User registration and authentication
+- Job search and filtering
+- Job application submission
+- Saved jobs and job alerts
+- Contact Us form with preferred contact date (must be today or later)
+- Admin dashboard for managing users, jobs, and contact messages
+- Email notifications for job alerts
+- Responsive UI with Razor views
+
+## How to Run the Project
+1. **Clone the repository:**
+    ```
+    git clone https://github.com/moradiyaaman/JobPortal.git
+    cd JobPortal
+    ```
+2. **Set up the database:**
+    - Ensure SQL Server is running and update the connection string in `appsettings.json` if needed.
+    - Run migrations:
+       ```
+       dotnet ef database update
+       ```
+3. **Run the application:**
+    ```
+    dotnet run
+    ```
+    The site will be available at `https://localhost:5001` or `http://localhost:5000` by default.
+
+## Team Members
+- **Harshit ce095**: Project lead, backend (ASP.NET Core, EF Core), job alert system, admin features
+- **Aman ce**: Frontend (Razor views, CSS), user dashboard, job search UI
+- **Neel**: Database design, migrations, deployment (Docker, AWS)
+
+---
+
+For any questions or issues, please contact the project maintainer.
