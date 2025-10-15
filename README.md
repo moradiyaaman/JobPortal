@@ -117,6 +117,6 @@ For production environments, use generated migrations with your deployment pipel
 |-------------|------------------|
 | Harshit (ce095) | Solution architecture, backend APIs, job alert pipeline, DevOps automation |
 | Aman (ce) | Frontend UX, Razor view components, responsive styling, accessibility review |
-| Neel | Database schema design, EF Core migrations, infrastructure (Docker, AWS deployment) |
+| Neel | Database schema design, EF Core migrations|
 
 For questions or collaboration ideas, feel free to open an issue or reach out to the maintainers.
